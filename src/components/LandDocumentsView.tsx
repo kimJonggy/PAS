@@ -118,19 +118,19 @@ export const LandDocumentsView: React.FC<LandDocumentsViewProps> = () => {
             <h2 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight">
               {docLang === 'bn' ? OFFICIAL_TRUST_DEED.titleBn : OFFICIAL_TRUST_DEED.titleEn}
             </h2>
-            <h3 className="text-base sm:text-lg font-bold text-emerald-400">
+            <h3 className={`font-bold text-emerald-400 ${docLang === 'bn' ? 'text-lg sm:text-2xl' : 'text-base sm:text-lg'}`}>
               {docLang === 'bn' ? OFFICIAL_TRUST_DEED.subtitleBn : OFFICIAL_TRUST_DEED.subtitleEn}
             </h3>
 
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed pt-1 text-left">
+            <p className={`text-slate-300 leading-relaxed pt-1 text-left ${docLang === 'bn' ? 'text-sm sm:text-base md:text-lg' : 'text-xs sm:text-sm'}`}>
               {docLang === 'bn' ? OFFICIAL_TRUST_DEED.preambleBn : OFFICIAL_TRUST_DEED.preambleEn}
             </p>
           </div>
 
           {/* Key Legal Highlights Box */}
-          <div className="grid grid-cols-2 gap-3 shrink-0 bg-white/5 p-4 sm:p-5 rounded-2xl border border-white/10 text-xs">
+          <div className="grid grid-cols-2 gap-3 shrink-0 bg-white/5 p-4 sm:p-5 rounded-2xl border border-white/10 text-xs sm:text-sm">
             <div>
-              <span className="text-slate-400 block text-[10px] font-semibold">
+              <span className="text-slate-400 block text-xs font-semibold">
                 {docLang === 'bn' ? 'কার্যকর তারিখ' : 'Effective Date'}
               </span>
               <strong className="text-emerald-300 font-mono text-xs sm:text-sm">
@@ -139,7 +139,7 @@ export const LandDocumentsView: React.FC<LandDocumentsViewProps> = () => {
             </div>
 
             <div>
-              <span className="text-slate-400 block text-[10px] font-semibold">
+              <span className="text-slate-400 block text-xs font-semibold">
                 {docLang === 'bn' ? 'মোট শেয়ার কাঠামো' : 'Total Shares'}
               </span>
               <strong className="text-amber-300 font-mono text-xs sm:text-sm">
@@ -148,7 +148,7 @@ export const LandDocumentsView: React.FC<LandDocumentsViewProps> = () => {
             </div>
 
             <div>
-              <span className="text-slate-400 block text-[10px] font-semibold">
+              <span className="text-slate-400 block text-xs font-semibold">
                 {docLang === 'bn' ? 'মাসিক কিস্তি' : 'Monthly Installment'}
               </span>
               <strong className="text-white font-mono text-xs sm:text-sm">
@@ -157,7 +157,7 @@ export const LandDocumentsView: React.FC<LandDocumentsViewProps> = () => {
             </div>
 
             <div>
-              <span className="text-slate-400 block text-[10px] font-semibold">
+              <span className="text-slate-400 block text-xs font-semibold">
                 {docLang === 'bn' ? 'ভর্তি ফি (অফেরতযোগ্য)' : 'Admission Fee'}
               </span>
               <strong className="text-white font-mono text-xs sm:text-sm">
@@ -165,7 +165,7 @@ export const LandDocumentsView: React.FC<LandDocumentsViewProps> = () => {
               </strong>
             </div>
 
-            <div className="col-span-2 pt-2 border-t border-white/10 text-[11px] text-slate-300 flex items-center gap-1.5">
+            <div className="col-span-2 pt-2 border-t border-white/10 text-xs sm:text-sm text-slate-300 flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span className="truncate">
                 {docLang === 'bn' ? OFFICIAL_TRUST_DEED.officeBn : OFFICIAL_TRUST_DEED.officeEn}
@@ -176,17 +176,17 @@ export const LandDocumentsView: React.FC<LandDocumentsViewProps> = () => {
       </div>
 
       {/* Reassuring Notice on Land Acquisition Policy (Clause 4.3) */}
-      <div className="p-4 bg-amber-50/80 border border-amber-300 rounded-2xl flex items-start gap-3 shadow-2xs text-xs sm:text-sm">
-        <div className="w-7 h-7 rounded-xl bg-amber-200 text-amber-900 flex items-center justify-center shrink-0 mt-0.5">
+      <div className="p-4 sm:p-5 bg-amber-50/80 border border-amber-300 rounded-2xl flex items-start gap-3.5 shadow-2xs">
+        <div className="w-8 h-8 rounded-xl bg-amber-200 text-amber-900 flex items-center justify-center shrink-0 mt-0.5">
           <Info className="w-4 h-4" />
         </div>
-        <div className="space-y-1">
-          <h4 className="font-bold text-amber-950 text-xs sm:text-sm">
+        <div className="space-y-1.5">
+          <h4 className={`font-bold text-amber-950 ${docLang === 'bn' ? 'text-sm sm:text-lg' : 'text-xs sm:text-sm'}`}>
             {docLang === 'bn'
               ? 'জমি অধিগ্রহণ ও প্রকল্প বাস্তবায়ন নীতি (ধারা ৪.৩ অনুযায়ী)'
               : 'Land Acquisition & Project Execution Policy (Under Clause 4.3)'}
           </h4>
-          <p className="text-amber-900/90 text-xs leading-relaxed text-left">
+          <p className={`text-amber-900/90 leading-relaxed text-left ${docLang === 'bn' ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}>
             {docLang === 'bn'
               ? 'বর্তমানে সমিতি সদস্য ভর্তি ও মাসিক কিস্তির তহবিল সংগ্রহের প্রাথমিক ধাপে রয়েছে; এখনো কোনো জমি ক্রয় করা হয়নি। ট্রাস্ট দলিলের ধারা ৩.২ অনুযায়ী উপদেষ্টা পরিষদ কর্তৃক উপযুক্ত জমি চিহ্নিতকরণের পর নির্বাহী কমিটির সিদ্ধান্তক্রমে সদস্যদের শেয়ার অনুপাতে জমি ক্রয়ের অর্থ সংগ্রহ ও চূড়ান্ত দলিল রেজিস্ট্রি সম্পাদন করা হইবে।'
               : 'The Association is currently in the initial capital and monthly installment collection phase; no land has been purchased yet. In accordance with Clause 3.2, upon identification of suitable property by the Advisory Panel, land acquisition funds will be pooled and deeds registered proportionately among all valid members.'}
@@ -359,15 +359,15 @@ export const LandDocumentsView: React.FC<LandDocumentsViewProps> = () => {
                 onClick={() => toggleClause(clause.id)}
                 className="p-4 sm:p-5 flex items-center justify-between cursor-pointer select-none bg-slate-50/50 hover:bg-slate-50 transition-colors border-b border-slate-100"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-slate-900 text-white font-mono font-extrabold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-9 h-9 rounded-xl bg-slate-900 text-white font-mono font-extrabold text-sm flex items-center justify-center shrink-0 shadow-2xs">
                     {clause.number.replace(/[^0-9]/g, '') || clause.number}
                   </div>
                   <div>
-                    <span className="text-[10px] font-mono font-bold text-emerald-700 block">
+                    <span className="text-xs font-mono font-bold text-emerald-700 block">
                       {clause.number}
                     </span>
-                    <h4 className="font-bold text-sm sm:text-base text-slate-900">
+                    <h4 className={`font-bold text-slate-900 ${docLang === 'bn' ? 'text-base sm:text-xl' : 'text-sm sm:text-base'}`}>
                       {docLang === 'bn' ? clause.titleBn : clause.titleEn}
                     </h4>
                   </div>
@@ -375,7 +375,7 @@ export const LandDocumentsView: React.FC<LandDocumentsViewProps> = () => {
 
                 <div className="flex items-center gap-2">
                   {clause.keyPoints && (
-                    <span className="hidden md:inline-block px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-medium">
+                    <span className="hidden md:inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-medium">
                       {clause.keyPoints.length} {docLang === 'bn' ? 'মূল বিষয়' : 'Key Points'}
                     </span>
                   )}
@@ -387,24 +387,30 @@ export const LandDocumentsView: React.FC<LandDocumentsViewProps> = () => {
 
               {/* Clause Body */}
               {isExpanded && (
-                <div className="p-5 sm:p-6 space-y-5 motion-safe:animate-in motion-safe:fade-in duration-150 text-xs sm:text-sm text-slate-700">
+                <div className="p-5 sm:p-7 space-y-6 motion-safe:animate-in motion-safe:fade-in duration-150 text-slate-700">
                   {/* Main Paragraph Text */}
-                  <div className="prose prose-slate max-w-none text-left leading-relaxed whitespace-pre-line font-sans">
+                  <div className={`prose prose-slate max-w-none text-left whitespace-pre-line font-sans ${
+                    docLang === 'bn'
+                      ? 'text-base sm:text-[17px] md:text-lg leading-relaxed sm:leading-loose text-slate-800 font-normal'
+                      : 'text-sm sm:text-base leading-relaxed text-slate-700'
+                  }`}>
                     {docLang === 'bn' ? clause.contentBn : clause.contentEn}
                   </div>
 
                   {/* Key Takeaways Cards */}
                   {clause.keyPoints && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
                       {clause.keyPoints.map((kp, idx) => (
                         <div
                           key={idx}
-                          className="p-3 bg-emerald-50/60 border border-emerald-200/80 rounded-xl space-y-1"
+                          className="p-3.5 bg-emerald-50/60 border border-emerald-200/80 rounded-xl space-y-1.5"
                         >
-                          <span className="text-[10px] font-semibold text-emerald-800 block">
+                          <span className="text-xs font-semibold text-emerald-800 block">
                             {docLang === 'bn' ? kp.labelBn : kp.labelEn}
                           </span>
-                          <strong className="text-slate-900 text-xs block leading-tight font-sans">
+                          <strong className={`text-slate-900 block leading-snug font-sans font-bold ${
+                            docLang === 'bn' ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'
+                          }`}>
                             {docLang === 'bn' ? kp.valueBn : kp.valueEn}
                           </strong>
                         </div>
@@ -414,34 +420,40 @@ export const LandDocumentsView: React.FC<LandDocumentsViewProps> = () => {
 
                   {/* Sub-Clauses & Committee Members */}
                   {clause.subClauses && (
-                    <div className="space-y-3 pt-3 border-t border-slate-100">
+                    <div className="space-y-3.5 pt-3 border-t border-slate-100">
                       {clause.subClauses.map((sub, sIdx) => (
                         <div
                           key={sIdx}
-                          className="p-4 bg-slate-50 border border-slate-200/80 rounded-xl space-y-2.5"
+                          className="p-4 sm:p-5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-2.5"
                         >
                           <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">
+                            <span className="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-xs font-bold">
                               {sub.number}
                             </span>
-                            <h5 className="font-bold text-xs sm:text-sm text-slate-900">
+                            <h5 className={`font-bold text-slate-900 ${
+                              docLang === 'bn' ? 'text-sm sm:text-base md:text-lg' : 'text-xs sm:text-sm'
+                            }`}>
                               {docLang === 'bn' ? sub.titleBn : sub.titleEn}
                             </h5>
                           </div>
 
-                          <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line text-justify">
+                          <p className={`whitespace-pre-line text-left ${
+                            docLang === 'bn'
+                              ? 'text-sm sm:text-base md:text-[17px] leading-relaxed sm:leading-loose text-slate-700'
+                              : 'text-xs sm:text-sm leading-relaxed text-slate-600'
+                          }`}>
                             {docLang === 'bn' ? sub.contentBn : sub.contentEn}
                           </p>
 
                           {/* Members list if any */}
                           {sub.members && (
-                            <div className="pt-2 flex flex-wrap gap-1.5">
+                            <div className="pt-2 flex flex-wrap gap-2">
                               {sub.members.map((m, mIdx) => (
                                 <span
                                   key={mIdx}
-                                  className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-800 text-[11px] font-semibold flex items-center gap-1.5 shadow-2xs"
+                                  className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-800 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shadow-2xs"
                                 >
-                                  <Users className="w-3 h-3 text-emerald-600" />
+                                  <Users className="w-3.5 h-3.5 text-emerald-600" />
                                   <span>{m}</span>
                                 </span>
                               ))}
@@ -462,14 +474,14 @@ export const LandDocumentsView: React.FC<LandDocumentsViewProps> = () => {
       <div className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200">
           <div>
-            <h3 className="font-bold text-base sm:text-lg text-slate-900">
-              <span className="text-[10px] font-mono font-semibold text-emerald-700 mr-2">
-                ANNEXURES &amp; FORMS
+            <h3 className="font-bold text-lg sm:text-xl text-slate-900">
+              <span className="text-xs font-mono font-semibold text-emerald-700 mr-2">
+                Forms &amp; Annexures
               </span>
               {docLang === 'bn' ? 'সংযোজনীসমূহ ও অফিসিয়াল ফরম' : 'Official Annexures & Statutory Forms'}
             </h3>
           </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs sm:text-sm text-slate-500">
             {docLang === 'bn'
               ? 'নির্ধারিত ফরমগুলো সরাসরি দেখতে বা অফিসিয়াল প্যাডে প্রিন্ট করতে নির্বাচন করুন'
               : 'Select any form to view, fill details, or print on official letterhead'}
@@ -483,22 +495,26 @@ export const LandDocumentsView: React.FC<LandDocumentsViewProps> = () => {
               className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-emerald-500 hover:shadow-md transition-shadow duration-150 flex flex-col justify-between space-y-4 group"
             >
               <div className="space-y-2">
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-900 text-white inline-block">
+                <span className="px-2 py-0.5 rounded text-xs font-mono font-bold bg-slate-900 text-white inline-block">
                   {form.code}
                 </span>
-                <h4 className="font-bold text-sm text-slate-900 group-hover:text-emerald-700 transition-colors">
+                <h4 className={`font-bold text-slate-900 group-hover:text-emerald-700 transition-colors ${
+                  docLang === 'bn' ? 'text-base sm:text-lg' : 'text-sm sm:text-base'
+                }`}>
                   {docLang === 'bn' ? form.titleBn : form.titleEn}
                 </h4>
-                <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed text-left">
+                <p className={`line-clamp-3 leading-relaxed text-left ${
+                  docLang === 'bn' ? 'text-sm sm:text-base text-slate-600' : 'text-xs sm:text-sm text-slate-500'
+                }`}>
                   {docLang === 'bn' ? form.declarationBn : form.declarationEn}
                 </p>
               </div>
 
               <button
                 onClick={() => setActiveAnnexureModal(form)}
-                className="w-full py-2 px-3 rounded-xl bg-white hover:bg-emerald-600 text-slate-800 hover:text-white border border-slate-300 hover:border-emerald-600 font-bold text-xs flex items-center justify-center gap-2 shadow-2xs transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer group-hover:bg-emerald-600 group-hover:text-white"
+                className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-emerald-600 text-slate-800 hover:text-white border border-slate-300 hover:border-emerald-600 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-2xs transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer group-hover:bg-emerald-600 group-hover:text-white"
               >
-                <FileText className="w-3.5 h-3.5" />
+                <FileText className="w-4 h-4" />
                 <span>{docLang === 'bn' ? 'ফরম দেখুন ও প্রিন্ট করুন' : 'View & Print Form'}</span>
               </button>
             </div>

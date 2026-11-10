@@ -191,6 +191,12 @@
   color: var(--foreground) !important;
 }
 
+.dark th[class*="sticky"],
+.theme-forest-dark th[class*="sticky"] {
+  background-color: var(--muted) !important;
+  color: var(--foreground) !important;
+}
+
 .dark tbody tr:hover,
 .theme-forest-dark tbody tr:hover {
   background-color: var(--row-hover-bg) !important;
@@ -212,46 +218,116 @@
   background-color: var(--row-hover-sticky-bg) !important;
 }
 
-/* Neutral Slate Overrides */
+/* Neutral Slate Overrides (All opacities /10 through /90) */
 .dark .bg-slate-50,
+.dark .bg-slate-50\/10,
+.dark .bg-slate-50\/20,
+.dark .bg-slate-50\/30,
+.dark .bg-slate-50\/40,
+.dark .bg-slate-50\/50,
+.dark .bg-slate-50\/60,
+.dark .bg-slate-50\/70,
+.dark .bg-slate-50\/80,
+.dark .bg-slate-50\/90,
 .dark .bg-slate-100,
+.dark .bg-slate-100\/10,
+.dark .bg-slate-100\/20,
+.dark .bg-slate-100\/30,
+.dark .bg-slate-100\/40,
+.dark .bg-slate-100\/50,
 .dark .bg-slate-100\/60,
-.dark .bg-slate-100\/70,
 .dark .bg-slate-100\/80,
 .dark .bg-slate-100\/90,
-.dark .bg-slate-50\/30,
+.dark .bg-slate-200,
+.dark .bg-slate-200\/10,
+.dark .bg-slate-200\/20,
+.dark .bg-slate-200\/30,
+.dark .bg-slate-200\/40,
+.dark .bg-slate-200\/50,
+.dark .bg-slate-200\/60,
+.dark .bg-slate-200\/70,
+.dark .bg-slate-200\/80,
+.dark .bg-slate-200\/90,
 .theme-forest-dark .bg-slate-50,
+.theme-forest-dark .bg-slate-50\/10,
+.theme-forest-dark .bg-slate-50\/20,
+.theme-forest-dark .bg-slate-50\/30,
+.theme-forest-dark .bg-slate-50\/40,
+.theme-forest-dark .bg-slate-50\/50,
+.theme-forest-dark .bg-slate-50\/60,
+.theme-forest-dark .bg-slate-50\/70,
+.theme-forest-dark .bg-slate-50\/80,
+.theme-forest-dark .bg-slate-50\/90,
 .theme-forest-dark .bg-slate-100,
+.theme-forest-dark .bg-slate-100\/10,
+.theme-forest-dark .bg-slate-100\/20,
+.theme-forest-dark .bg-slate-100\/30,
+.theme-forest-dark .bg-slate-100\/40,
+.theme-forest-dark .bg-slate-100\/50,
 .theme-forest-dark .bg-slate-100\/60,
-.theme-forest-dark .bg-slate-100\/70,
 .theme-forest-dark .bg-slate-100\/80,
 .theme-forest-dark .bg-slate-100\/90,
-.theme-forest-dark .bg-slate-50\/30 {
+.theme-forest-dark .bg-slate-200,
+.theme-forest-dark .bg-slate-200\/10,
+.theme-forest-dark .bg-slate-200\/20,
+.theme-forest-dark .bg-slate-200\/30,
+.theme-forest-dark .bg-slate-200\/40,
+.theme-forest-dark .bg-slate-200\/50,
+.theme-forest-dark .bg-slate-200\/60,
+.theme-forest-dark .bg-slate-200\/70,
+.theme-forest-dark .bg-slate-200\/80,
+.theme-forest-dark .bg-slate-200\/90 {
   background-color: var(--muted) !important;
   color: var(--foreground) !important;
 }
 
-.dark .bg-slate-200,
-.dark .bg-slate-200\/70,
-.theme-forest-dark .bg-slate-200,
-.theme-forest-dark .bg-slate-200\/70 {
-  background-color: var(--slate-subtle) !important;
+/* Outer canvas background (Used on App root wrapper) */
+.dark .bg-slate-100\/70,
+.theme-forest-dark .bg-slate-100\/70 {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+/* Hover States for light slate and white surfaces */
+.dark .hover\:bg-slate-50:hover,
+.dark .hover\:bg-slate-50\/70:hover,
+.dark .hover\:bg-slate-100:hover,
+.dark .hover\:bg-slate-200:hover,
+.dark .hover\:bg-slate-200\/70:hover,
+.dark .hover\:bg-white:hover,
+.dark .hover\:bg-white\/60:hover,
+.dark .hover\:bg-white\/80:hover,
+.theme-forest-dark .hover\:bg-slate-50:hover,
+.theme-forest-dark .hover\:bg-slate-50\/70:hover,
+.theme-forest-dark .hover\:bg-slate-100:hover,
+.theme-forest-dark .hover\:bg-slate-200:hover,
+.theme-forest-dark .hover\:bg-slate-200\/70:hover,
+.theme-forest-dark .hover\:bg-white:hover,
+.theme-forest-dark .hover\:bg-white\/60:hover,
+.theme-forest-dark .hover\:bg-white\/80:hover {
+  background-color: var(--accent) !important;
   color: var(--foreground) !important;
 }
 
 /* Border Overrides */
+.dark .border-slate-50,
 .dark .border-slate-100,
 .dark .border-slate-200,
-.dark .border-slate-300,
+.dark .border-slate-200\/60,
 .dark .border-slate-200\/80,
 .dark .border-slate-200\/90,
+.dark .border-slate-300,
+.dark .border-slate-400,
 .dark .divide-slate-100,
 .dark .divide-slate-200,
+.theme-forest-dark .border-slate-50,
 .theme-forest-dark .border-slate-100,
 .theme-forest-dark .border-slate-200,
-.theme-forest-dark .border-slate-300,
+.theme-forest-dark .border-slate-200\/60,
 .theme-forest-dark .border-slate-200\/80,
 .theme-forest-dark .border-slate-200\/90,
+.theme-forest-dark .border-slate-300,
+.theme-forest-dark .border-slate-400,
 .theme-forest-dark .divide-slate-100,
 .theme-forest-dark .divide-slate-200 {
   border-color: var(--border) !important;
@@ -283,21 +359,27 @@
    AMBER / OVERDUE CELL OVERRIDES (Prevents white-on-white text)
    ------------------------------------------------------------- */
 .dark .bg-amber-50,
+.dark .bg-amber-50\/10,
 .dark .bg-amber-50\/20,
 .dark .bg-amber-50\/30,
 .dark .bg-amber-50\/40,
+.dark .bg-amber-50\/50,
 .dark .bg-amber-50\/60,
 .dark .bg-amber-50\/70,
 .dark .bg-amber-50\/80,
+.dark .bg-amber-50\/90,
 .dark .bg-amber-100,
 .dark .bg-amber-200,
 .theme-forest-dark .bg-amber-50,
+.theme-forest-dark .bg-amber-50\/10,
 .theme-forest-dark .bg-amber-50\/20,
 .theme-forest-dark .bg-amber-50\/30,
 .theme-forest-dark .bg-amber-50\/40,
+.theme-forest-dark .bg-amber-50\/50,
 .theme-forest-dark .bg-amber-50\/60,
 .theme-forest-dark .bg-amber-50\/70,
 .theme-forest-dark .bg-amber-50\/80,
+.theme-forest-dark .bg-amber-50\/90,
 .theme-forest-dark .bg-amber-100,
 .theme-forest-dark .bg-amber-200 {
   background-color: var(--badge-amber-bg) !important;
@@ -344,17 +426,27 @@
    EMERALD / PAID & DEPOSIT OVERRIDES (Luminous Mint)
    ------------------------------------------------------------- */
 .dark .bg-emerald-50,
+.dark .bg-emerald-50\/10,
 .dark .bg-emerald-50\/20,
 .dark .bg-emerald-50\/30,
 .dark .bg-emerald-50\/40,
+.dark .bg-emerald-50\/50,
+.dark .bg-emerald-50\/60,
 .dark .bg-emerald-50\/70,
+.dark .bg-emerald-50\/80,
+.dark .bg-emerald-50\/90,
 .dark .bg-emerald-100,
 .dark .bg-emerald-200,
 .theme-forest-dark .bg-emerald-50,
+.theme-forest-dark .bg-emerald-50\/10,
 .theme-forest-dark .bg-emerald-50\/20,
 .theme-forest-dark .bg-emerald-50\/30,
 .theme-forest-dark .bg-emerald-50\/40,
+.theme-forest-dark .bg-emerald-50\/50,
+.theme-forest-dark .bg-emerald-50\/60,
 .theme-forest-dark .bg-emerald-50\/70,
+.theme-forest-dark .bg-emerald-50\/80,
+.theme-forest-dark .bg-emerald-50\/90,
 .theme-forest-dark .bg-emerald-100,
 .theme-forest-dark .bg-emerald-200 {
   background-color: var(--badge-emerald-bg) !important;
@@ -395,18 +487,28 @@
    ROSE / DUE & LATE FEE OVERRIDES (Vibrant Coral Rose)
    ------------------------------------------------------------- */
 .dark .bg-rose-50,
+.dark .bg-rose-50\/10,
+.dark .bg-rose-50\/20,
 .dark .bg-rose-50\/30,
 .dark .bg-rose-50\/40,
 .dark .bg-rose-50\/50,
 .dark .bg-rose-50\/60,
+.dark .bg-rose-50\/70,
+.dark .bg-rose-50\/80,
+.dark .bg-rose-50\/90,
 .dark .bg-rose-100,
 .dark .bg-rose-100\/70,
 .dark .bg-rose-200,
 .theme-forest-dark .bg-rose-50,
+.theme-forest-dark .bg-rose-50\/10,
+.theme-forest-dark .bg-rose-50\/20,
 .theme-forest-dark .bg-rose-50\/30,
 .theme-forest-dark .bg-rose-50\/40,
 .theme-forest-dark .bg-rose-50\/50,
 .theme-forest-dark .bg-rose-50\/60,
+.theme-forest-dark .bg-rose-50\/70,
+.theme-forest-dark .bg-rose-50\/80,
+.theme-forest-dark .bg-rose-50\/90,
 .theme-forest-dark .bg-rose-100,
 .theme-forest-dark .bg-rose-100\/70,
 .theme-forest-dark .bg-rose-200 {
@@ -481,11 +583,25 @@
    BLUE / CHANNELS OVERRIDES (Bright Sky/Cyan)
    ------------------------------------------------------------- */
 .dark .bg-blue-50,
+.dark .bg-blue-50\/10,
+.dark .bg-blue-50\/20,
+.dark .bg-blue-50\/30,
 .dark .bg-blue-50\/40,
+.dark .bg-blue-50\/50,
 .dark .bg-blue-50\/60,
+.dark .bg-blue-50\/70,
+.dark .bg-blue-50\/80,
+.dark .bg-blue-50\/90,
 .theme-forest-dark .bg-blue-50,
+.theme-forest-dark .bg-blue-50\/10,
+.theme-forest-dark .bg-blue-50\/20,
+.theme-forest-dark .bg-blue-50\/30,
 .theme-forest-dark .bg-blue-50\/40,
-.theme-forest-dark .bg-blue-50\/60 {
+.theme-forest-dark .bg-blue-50\/50,
+.theme-forest-dark .bg-blue-50\/60,
+.theme-forest-dark .bg-blue-50\/70,
+.theme-forest-dark .bg-blue-50\/80,
+.theme-forest-dark .bg-blue-50\/90 {
   background-color: var(--badge-blue-bg) !important;
 }
 
@@ -520,61 +636,174 @@
   border-color: var(--border);
 }
 
+.dark input::placeholder,
+.dark textarea::placeholder,
+.theme-forest-dark input::placeholder,
+.theme-forest-dark textarea::placeholder {
+  color: var(--muted-foreground) !important;
+}
+
 /* =========================================================
    STANDARD PRINT STYLESHEET (A4 / LETTER)
    ========================================================= */
 @media print {
   @page {
+    size: A4 landscape;
+    margin: 8mm 6mm 8mm 6mm;
+  }
+
+  @page portrait-modal {
     size: A4 portrait;
-    margin: 12mm 10mm 12mm 10mm;
+    margin: 10mm 10mm 10mm 10mm;
+  }
+
+  body.print-modal-active {
+    page: portrait-modal;
   }
 
   html, body {
-    background-color: transparent;
-    color: var(--foreground);
-    width: 100%;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    font-size: 11pt;
+    background-color: var(--card) !important;
+    color: var(--foreground) !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 8.5pt;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
   header, nav, button, input, .print\:hidden {
-    display: none;
+    display: none !important;
   }
 
+  /* Reset dark mode on print to prevent wasting ink and ensure 100% legibility */
+  .dark {
+    color-scheme: light !important;
+  }
+
+  .dark main, .dark table, .dark tr, .dark th, .dark td {
+    background-color: transparent !important;
+    color: var(--foreground) !important;
+    border-color: var(--border) !important;
+  }
+
+  /* Wide table support without clipping */
+  .overflow-x-auto, [class*="overflow-x-"] {
+    overflow: visible !important;
+  }
+
+  /* Prevent sticky positioning glitches during printing */
+  .sticky {
+    position: static !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Compact Summary Cards row on print */
+  .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+    page-break-inside: avoid !important;
+  }
+
+  .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 img {
+    display: none !important;
+  }
+
+  /* Master Ledger table print styles */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 7.5pt !important;
+    table-layout: auto !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  thead th {
+    background-color: var(--muted) !important;
+    color: var(--foreground) !important;
+    border: 1px solid var(--border) !important;
+    padding: 4px 4px !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+  }
+
+  tbody tr {
+    page-break-inside: avoid !important;
+    page-break-after: auto !important;
+  }
+
+  tbody td {
+    padding: 4px 4px !important;
+    border: 1px solid var(--border) !important;
+    color: var(--foreground) !important;
+    font-size: 7.5pt !important;
+  }
+
+  tbody tr:nth-child(even) td {
+    background-color: var(--background) !important;
+  }
+
+  tfoot {
+    display: table-row-group !important;
+    page-break-inside: avoid !important;
+  }
+
+  tfoot tr {
+    background-color: var(--muted) !important;
+  }
+
+  tfoot td {
+    background-color: var(--muted) !important;
+    color: var(--foreground) !important;
+    font-weight: 800 !important;
+    border: 1px solid var(--border) !important;
+    padding: 4px 4px !important;
+    font-size: 8pt !important;
+  }
+
+  /* Modal print isolation remains untouched */
   body.print-modal-active main,
   body.print-modal-active > div > header,
   body.print-modal-active > div > main {
-    display: none;
+    display: none !important;
   }
 
   body.print-modal-active .print-modal {
-    position: static;
-    display: block;
-    width: 100%;
-    height: auto;
-    background: transparent;
-    padding: 0;
-    margin: 0;
-    overflow: visible;
-    box-shadow: none;
-    border: none;
-    z-index: 99999;
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border: none !important;
+    z-index: 99999 !important;
   }
 
   body.print-modal-active .print-modal > div {
-    position: static;
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    padding: 0;
-    box-shadow: none;
-    border: none;
-    border-radius: 0;
-    overflow: visible;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
   }
 
   #printable-member-portfolio {
@@ -607,15 +836,16 @@
     border: 2px solid var(--foreground);
     border-radius: 12px;
     box-shadow: none;
-    margin: 10mm auto;
+    margin: 8mm auto;
     padding: 24px;
     width: 95%;
     max-width: 750px;
     page-break-inside: avoid;
   }
 
-  .break-inside-avoid {
-    break-inside: avoid;
-    page-break-inside: avoid;
+  .break-inside-avoid,
+  .page-break-inside-avoid {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 }

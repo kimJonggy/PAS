@@ -85,32 +85,32 @@ export const AnnexureFormModal: React.FC<AnnexureFormModalProps> = ({
           </div>
 
           {/* Recipient and Subject */}
-          <div className="space-y-1 text-xs">
+          <div className="space-y-1.5 text-xs sm:text-sm">
             <p className="text-slate-500">তারিখ / Date: {new Date().toLocaleDateString('en-GB')}</p>
             <p className="font-bold text-slate-800">বরাবর / To:</p>
             <p className="text-slate-700">নির্বাহী কমিটি (Executive Committee)</p>
             <p className="text-slate-700">প্রগ্রেসিভ কোঅপারেটিভ সোসাইটি / প্রগ্রেসিভ এসোসিয়েশন সোসাইটি</p>
             <p className="text-slate-700">ঢাকা, বাংলাদেশ।</p>
-            <p className="pt-2 font-bold text-slate-900 text-xs sm:text-sm">
+            <p className="pt-2 font-bold text-slate-900 text-sm sm:text-base">
               বিষয়: <span className="underline">{isBn ? form.subjectBn : form.subjectEn}</span>
             </p>
           </div>
 
           {/* Solemn Declaration */}
-          <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs leading-relaxed text-slate-700 text-left">
+          <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-xl text-sm sm:text-base leading-relaxed text-slate-700 text-left">
             {isBn ? form.declarationBn : form.declarationEn}
           </div>
 
           {/* Form Fields */}
           <div className="space-y-3 pt-2">
-            <span className="font-semibold text-xs text-slate-700 block pb-1 border-b border-slate-200">
+            <span className="font-semibold text-xs sm:text-sm text-slate-700 block pb-1 border-b border-slate-200">
               {isBn ? 'সদস্যের তথ্য ও বিবরণী' : 'Particulars & Information'}
             </span>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {form.fields.map((f, i) => (
                 <div key={i} className={f.type === 'textarea' ? 'sm:col-span-2' : ''}>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1">
                     {isBn ? f.labelBn : f.labelEn}
                     {f.required && <span className="text-rose-500 ml-0.5">*</span>}
                   </label>
@@ -122,7 +122,7 @@ export const AnnexureFormModal: React.FC<AnnexureFormModalProps> = ({
                         setFormData({ ...formData, [f.labelEn]: e.target.value })
                       }
                       placeholder="..."
-                      className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs sm:text-sm"
                     />
                   ) : (
                     <input
@@ -132,7 +132,7 @@ export const AnnexureFormModal: React.FC<AnnexureFormModalProps> = ({
                         setFormData({ ...formData, [f.labelEn]: e.target.value })
                       }
                       placeholder="..."
-                      className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs sm:text-sm"
                     />
                   )}
                 </div>

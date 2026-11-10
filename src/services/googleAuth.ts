@@ -10,7 +10,7 @@ import {
 import firebaseConfig from '../../firebase-applet-config.json';
 
 // Initialize Firebase only once
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+export const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
 export const SCOPES = [
@@ -63,6 +63,18 @@ export const googleSignIn = async (): Promise<{ user: User; accessToken: string 
     return { user: result.user, accessToken: cachedAccessToken };
   } catch (error: any) {
     console.error('Google sign-in error:', error);
+    if (error?.code === 'auth/unauthorized-domain') {
+      const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'current domain';
+      if (currentHost === '127.0.0.1') {
+        throw new Error(
+          '127.0.0.1 is not an authorized domain in Firebase. Please open the app at http://localhost:3000 instead.'
+        );
+      } else {
+        throw new Error(
+          `Domain "${currentHost}" is not authorized in Firebase Console. Add it under Authentication > Settings > Authorized Domains.`
+        );
+      }
+    }
     throw error;
   } finally {
     isSigningIn = false;

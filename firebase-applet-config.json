@@ -1,11 +1,9 @@
 {
-  "projectId": "gen-lang-client-0969008426",
-  "appId": "1:71809191467:web:018d7de4aac493a870a46e",
-  "apiKey": "AIzaSyDSwjP8dySS7VO_F_sFf5BK7VttXlqOhDE",
-  "authDomain": "gen-lang-client-0969008426.firebaseapp.com",
-  "storageBucket": "gen-lang-client-0969008426.firebasestorage.app",
-  "messagingSenderId": "71809191467",
-  "measurementId": "",
-  "oAuthClientId": "71809191467-od48sji1gebf487lqs6s56kgkom730h7.apps.googleusercontent.com",
-  "recaptchaSiteKey": ""
+  "projectId": "pas-society",
+  "appId": "1:932632086650:web:497c3228809fc8204693c3",
+  "apiKey": "AIzaSyCtHNLf0ilrD5VUbWJ1bLomIg6OyfBvdCw",
+  "authDomain": "pas-society.firebaseapp.com",
+  "storageBucket": "pas-society.firebasestorage.app",
+  "messagingSenderId": "932632086650",
+  "measurementId": "G-H62DFGV6E7"
 }

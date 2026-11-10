@@ -92,9 +92,22 @@ export const MembersDirectoryView: React.FC<MembersDirectoryViewProps> = ({
   const { isAdmin, requireAdmin } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'clean' | 'due' | 'closed'>('all');
-  const [sortBy, setSortBy] = useState<'name' | 'funded' | 'due' | 'shares'>('funded');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortBy, setSortBy] = useState<'pas' | 'name' | 'funded' | 'due' | 'shares'>('pas');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [breakdownShare, setBreakdownShare] = useState<ShareRecord | null>(null);
+
+  // Helper to extract the minimum PAS number for sequential sorting (PAS-01 -> 1, PAS-04 -> 4, etc.)
+  const getMinPasNumber = (m: MemberDirectoryInfo): number => {
+    let min = 999999;
+    for (const id of m.shareIds) {
+      const match = id.match(/PAS-(\d+)/i);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num < min) min = num;
+      }
+    }
+    return min;
+  };
 
   // Member editing modal state
   const [editingMember, setEditingMember] = useState<MemberDirectoryInfo | null>(null);
@@ -105,11 +118,12 @@ export const MembersDirectoryView: React.FC<MembersDirectoryViewProps> = ({
     address: '',
   });
 
-  // Group unique members
+  // Group unique living registered members (strictly 21 active members, exclude closed slot)
   const memberList: MemberDirectoryInfo[] = useMemo(() => {
     const memberMap = new Map<string, ShareRecord[]>();
 
     for (const s of shares) {
+      if (s.isClosed || s.memberName === 'Closed Id') continue;
       const name = s.memberName?.trim();
       if (!name) continue;
       if (!memberMap.has(name)) {
@@ -178,11 +192,12 @@ export const MembersDirectoryView: React.FC<MembersDirectoryViewProps> = ({
     });
   }, [memberList, statusFilter, searchTerm]);
 
-  // Sorting
+  // Sorting: Default by PAS serial ascending (PAS-01, PAS-04, PAS-07, ...)
   const sortedMembers = useMemo(() => {
     return [...filteredMembers].sort((a, b) => {
       let cmp = 0;
-      if (sortBy === 'name') cmp = a.name.localeCompare(b.name);
+      if (sortBy === 'pas') cmp = getMinPasNumber(a) - getMinPasNumber(b);
+      else if (sortBy === 'name') cmp = a.name.localeCompare(b.name);
       else if (sortBy === 'funded') cmp = a.totalFunded - b.totalFunded;
       else if (sortBy === 'due') cmp = a.totalDue - b.totalDue;
       else if (sortBy === 'shares') cmp = a.sharesCount - b.sharesCount;
@@ -217,12 +232,12 @@ export const MembersDirectoryView: React.FC<MembersDirectoryViewProps> = ({
     setEditingMember(null);
   };
 
-  const toggleSort = (field: 'name' | 'funded' | 'due' | 'shares') => {
+  const toggleSort = (field: 'pas' | 'name' | 'funded' | 'due' | 'shares') => {
     if (sortBy === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
       setSortBy(field);
-      setSortOrder('desc');
+      setSortOrder(field === 'pas' || field === 'name' ? 'asc' : 'desc');
     }
   };
 
@@ -231,59 +246,6 @@ export const MembersDirectoryView: React.FC<MembersDirectoryViewProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Top Banner KPI */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex items-center justify-between">
-          <div>
-            <span className="text-xs font-semibold text-slate-500 block">Registered Members</span>
-            <span className="text-2xl font-black text-slate-900 font-mono mt-0.5 block">{memberList.length}</span>
-            <span className="text-[11px] text-slate-400">Total society portfolio holders</span>
-          </div>
-          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-            <Users className="w-5 h-5" />
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex items-center justify-between">
-          <div>
-            <span className="text-xs font-semibold text-slate-500 block">Total Active Shares</span>
-            <span className="text-2xl font-black text-slate-900 font-mono mt-0.5 block">
-              {memberList.reduce((acc, m) => acc + (m.isClosed ? 0 : m.sharesCount), 0)}
-            </span>
-            <span className="text-[11px] text-slate-400">Assigned member share units</span>
-          </div>
-          <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
-            <Building className="w-5 h-5" />
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex items-center justify-between">
-          <div>
-            <span className="text-xs font-semibold text-slate-500 block">Total Funded Amount</span>
-            <span className="text-2xl font-black text-emerald-700 font-mono mt-0.5 block">
-              {formatTaka(totalAllFunded)}
-            </span>
-            <span className="text-[11px] text-emerald-600 font-medium">All verified deposits &amp; admission</span>
-          </div>
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-            <CreditCard className="w-5 h-5" />
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex items-center justify-between">
-          <div>
-            <span className="text-xs font-semibold text-slate-500 block">Total Outstanding Due</span>
-            <span className={`text-2xl font-black font-mono mt-0.5 block ${totalAllDue > 0 ? 'text-rose-600' : 'text-slate-400'}`}>
-              {formatTaka(totalAllDue)}
-            </span>
-            <span className="text-[11px] text-slate-400">Pending monthly installments</span>
-          </div>
-          <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
-            <AlertTriangle className="w-5 h-5" />
-          </div>
-        </div>
-      </div>
-
       {/* Directory Table Card */}
       <div className="bg-white rounded-xl border border-slate-200/90 shadow-sm overflow-hidden">
         {/* Header Toolbar */}
@@ -331,25 +293,182 @@ export const MembersDirectoryView: React.FC<MembersDirectoryViewProps> = ({
             </div>
 
             {/* Search Input */}
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-2 text-slate-400" />
+            <div className="relative w-full sm:w-auto">
+              <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search name, NID, phone, address..."
-                className="w-56 sm:w-64 pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 focus:outline-emerald-500 focus:ring-1 focus:ring-emerald-500 bg-white"
+                className="w-full sm:w-64 pl-9 pr-3 py-2 sm:py-1.5 text-xs rounded-lg border border-slate-300 focus:outline-emerald-500 focus:ring-1 focus:ring-emerald-500 bg-white shadow-2xs"
               />
             </div>
           </div>
         </div>
 
-        {/* Full-width responsive table */}
-        <div className="w-full overflow-x-auto xl:overflow-x-visible">
+        {/* Mobile-Friendly Member Cards List (< md screens) */}
+        <div className="md:hidden space-y-3 p-3">
+          {sortedMembers.length === 0 ? (
+            <div className="py-10 text-center text-slate-500 text-xs">
+              No matching member profile found.
+            </div>
+          ) : (
+            sortedMembers.map((m, idx) => {
+              const hasDue = m.totalDue > 0;
+              return (
+                <div
+                  key={`mobile-m-${m.name}-${idx}`}
+                  className={`bg-white rounded-2xl border p-4 shadow-xs space-y-3 transition-colors ${
+                    m.isClosed
+                      ? 'border-slate-200 bg-slate-50/60 opacity-80'
+                      : hasDue
+                      ? 'border-amber-300 ring-1 ring-amber-200/60'
+                      : 'border-slate-200/90'
+                  }`}
+                >
+                  {/* Card Header: SL, Name, Share IDs, Due badge */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
+                          m.isClosed
+                            ? 'bg-slate-200 text-slate-600'
+                            : hasDue
+                            ? 'bg-amber-100 text-amber-900 border border-amber-200'
+                            : 'bg-emerald-100 text-emerald-900 border border-emerald-200'
+                        }`}
+                      >
+                        {m.name.slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <button
+                          type="button"
+                          onClick={() => onSelectMember(m.name)}
+                          className="font-bold text-slate-900 text-sm hover:text-emerald-700 text-left cursor-pointer flex items-center gap-1 truncate"
+                        >
+                          <span className="truncate">{m.name}</span>
+                          <UserCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        </button>
+                        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                          <span className="text-[10px] font-mono text-slate-400">SL: {(idx + 1).toString().padStart(2, '0')}</span>
+                          {m.shareIds.map((id) => (
+                            <span
+                              key={id}
+                              className="text-[10px] font-mono font-semibold px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-800 border border-emerald-200"
+                            >
+                              {id}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    {/* Due Status Chip */}
+                    {m.isClosed ? (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 shrink-0">
+                        Closed
+                      </span>
+                    ) : hasDue ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setBreakdownShare(
+                            m.shares.find((s) => s.dueMonths > 0) || m.shares[0]
+                          )
+                        }
+                        className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200 font-mono shrink-0 cursor-pointer"
+                        title="Click to view breakdown"
+                      >
+                        {formatTaka(m.totalDue)}
+                      </button>
+                    ) : (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
+                        Clean
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Contact Info: Phone, NID, Address */}
+                  <div className="bg-slate-50 rounded-xl p-2.5 space-y-1.5 text-xs text-slate-600">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400 text-[11px]">Phone:</span>
+                      <a
+                        href={`tel:${m.phone}`}
+                        className="font-mono font-semibold text-emerald-700 hover:underline flex items-center gap-1"
+                      >
+                        <Phone className="w-3 h-3" />
+                        <span>{m.phone}</span>
+                      </a>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400 text-[11px]">NID:</span>
+                      <span className="font-mono font-medium text-slate-800">{m.nid}</span>
+                    </div>
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-slate-400 text-[11px] shrink-0">Address:</span>
+                      <span className="text-slate-700 text-right truncate max-w-[200px]">{m.address}</span>
+                    </div>
+                  </div>
+
+                  {/* Financial Summary & Actions */}
+                  <div className="flex items-center justify-between pt-1">
+                    <div>
+                      <span className="text-[10px] text-slate-400 block">Total Funded:</span>
+                      <span className="font-mono font-extrabold text-emerald-800 text-sm">
+                        {formatTaka(m.totalFunded)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(m)}
+                        className="p-2 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-semibold cursor-pointer active:scale-95"
+                        title="Edit profile"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onSelectMember(m.name)}
+                        className="px-3 py-1.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 text-xs font-semibold cursor-pointer shadow-2xs active:scale-95"
+                      >
+                        Portfolio
+                      </button>
+                      {!m.isClosed && (
+                        <button
+                          type="button"
+                          onClick={() => onOpenPaymentForShare(m.shares[0])}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer shadow-2xs active:scale-95 ${
+                            hasDue
+                              ? 'bg-rose-600 hover:bg-rose-500 text-white'
+                              : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                          }`}
+                        >
+                          {hasDue ? 'Collect' : 'Pay'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Full-width responsive table (Desktop >= md screens) */}
+        <div className="hidden md:block w-full overflow-x-auto xl:overflow-x-visible">
           <table className="w-full text-left text-xs border-collapse">
             <thead className="bg-slate-100 text-slate-700 border-b border-slate-300 font-semibold select-none">
               <tr>
-                <th className="px-3 py-3 border-r border-slate-300 w-12 text-center">SL</th>
+                <th
+                  onClick={() => toggleSort('pas')}
+                  className="px-3 py-3 border-r border-slate-300 w-14 text-center cursor-pointer hover:bg-slate-200/70"
+                  title="Sort by PAS serial"
+                >
+                  <div className="flex items-center justify-center gap-1">
+                    <span>SL</span>
+                    <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                  </div>
+                </th>
                 <th
                   onClick={() => toggleSort('name')}
                   className="px-3 py-3 border-r border-slate-300 min-w-[170px] cursor-pointer hover:bg-slate-200/70"
@@ -360,8 +479,9 @@ export const MembersDirectoryView: React.FC<MembersDirectoryViewProps> = ({
                   </div>
                 </th>
                 <th
-                  onClick={() => toggleSort('shares')}
+                  onClick={() => toggleSort('pas')}
                   className="px-3 py-3 border-r border-slate-300 min-w-[110px] text-center cursor-pointer hover:bg-slate-200/70"
+                  title="Sort by PAS Share IDs"
                 >
                   <div className="flex items-center justify-center gap-1">
                     <span>Share IDs</span>
@@ -417,8 +537,8 @@ export const MembersDirectoryView: React.FC<MembersDirectoryViewProps> = ({
                       }`}
                     >
                       {/* SL */}
-                      <td className="px-3 py-3 border-r border-slate-200 text-center font-mono text-slate-500">
-                        {m.sl}
+                      <td className="px-3 py-3 border-r border-slate-200 text-center font-mono text-slate-500 font-semibold">
+                        {(idx + 1).toString().padStart(2, '0')}
                       </td>
 
                       {/* Name */}

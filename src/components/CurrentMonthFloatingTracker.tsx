@@ -197,11 +197,11 @@ export const CurrentMonthFloatingTracker: React.FC<CurrentMonthFloatingTrackerPr
       {/* ========================================================================= */}
       {/* 1. OBSIDIAN GLASSMORPHISM FLOATING TRIGGER PILL (BOTTOM-LEFT) */}
       {/* ========================================================================= */}
-      <aside aria-label="Quick payment tracker" className="fixed bottom-6 left-6 z-40 select-none">
+      <aside aria-label="Quick payment tracker" className="fixed bottom-3 left-3 sm:bottom-6 sm:left-6 z-40 select-none print:hidden">
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="group relative flex items-center gap-2.5 px-3.5 py-2.5 bg-slate-950 hover:bg-slate-900 border border-emerald-500/40 hover:border-emerald-400 text-white rounded-full shadow-2xl transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer"
+          className="group relative flex items-center gap-2 px-3 py-2 sm:px-3.5 sm:py-2.5 bg-slate-950 hover:bg-slate-900 border border-emerald-500/40 hover:border-emerald-400 text-white rounded-full shadow-2xl transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer"
           title={
             isBn
               ? `চলতি মাস (${currentMonth}) রিয়েল-টাইম ট্র্যাকার • হটকি [Alt + M]`
@@ -268,7 +268,7 @@ export const CurrentMonthFloatingTracker: React.FC<CurrentMonthFloatingTrackerPr
         >
           <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] motion-safe:animate-in motion-safe:zoom-in-95 duration-200">
             {/* Top Executive Header */}
-            <div className="px-6 py-5 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white flex items-center justify-between border-b border-slate-800 shrink-0">
+            <div className="px-4 sm:px-6 py-3.5 sm:py-5 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white flex items-center justify-between border-b border-slate-800 shrink-0">
               <div className="flex items-center gap-3.5">
                 <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shrink-0">
                   <Calendar className="w-5 h-5" />
@@ -357,7 +357,7 @@ export const CurrentMonthFloatingTracker: React.FC<CurrentMonthFloatingTrackerPr
             </div>
 
             {/* Segmented Filter Tabs & Search Bar */}
-            <div className="px-6 pt-4 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+            <div className="px-4 sm:px-6 pt-3 sm:pt-4 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 shrink-0">
               {/* Segmented Tabs */}
               <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200/80 text-xs">
                 <button

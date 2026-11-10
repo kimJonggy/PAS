@@ -158,21 +158,27 @@ export function formatSharesForSheet(
   }
 
   // Grand Total Row (Row 38)
+  const augStat = summary.monthStats?.['Aug-26'];
+  const sepStat = summary.monthStats?.['Sep-26'];
+  const octStat = summary.monthStats?.['Oct-26'];
+  const novStat = summary.monthStats?.['Nov-26'];
+  const decStat = summary.monthStats?.['Dec-26'];
+
   rows.push([
     '',
     'GRAND TOTAL',
     `${summary.totalShareIds} IDs`,
     summary.totalAdmissionCollected,
-    '30 Paid',
-    summary.monthStats['Aug-26'].paidAmount,
-    '27 Paid',
-    summary.monthStats['Sep-26'].paidAmount,
-    '27 Paid',
-    summary.monthStats['Oct-26'].paidAmount,
-    '-',
-    '-',
-    '-',
-    '-',
+    augStat ? `${augStat.paidShares} Paid` : '30 Paid',
+    augStat?.paidAmount ?? 0,
+    sepStat ? `${sepStat.paidShares} Paid` : '27 Paid',
+    sepStat?.paidAmount ?? 0,
+    octStat ? `${octStat.paidShares} Paid` : '27 Paid',
+    octStat?.paidAmount ?? 0,
+    novStat && novStat.paidShares > 0 ? `${novStat.paidShares} Paid` : '-',
+    novStat && novStat.paidAmount > 0 ? novStat.paidAmount : '-',
+    decStat && decStat.paidShares > 0 ? `${decStat.paidShares} Paid` : '-',
+    decStat && decStat.paidAmount > 0 ? decStat.paidAmount : '-',
     summary.totalBankDeposit,
     summary.totalDueMonths,
     summary.totalDuePrincipal,

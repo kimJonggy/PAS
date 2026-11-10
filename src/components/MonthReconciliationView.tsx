@@ -44,8 +44,8 @@ export const MonthReconciliationView: React.FC<MonthReconciliationViewProps> = (
 
   return (
     <div className="space-y-6">
-      {/* Month Navigation Pills */}
-      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-100 rounded-xl max-w-fit">
+      {/* Month Navigation Pills - Horizontal Swipe on Mobile */}
+      <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-xl overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex-nowrap sm:flex-wrap w-full sm:max-w-fit">
         {ALL_MONTHS.map((m) => {
           const stat = summary.monthStats[m];
           const isSelected = selectedMonth === m;
@@ -55,7 +55,7 @@ export const MonthReconciliationView: React.FC<MonthReconciliationViewProps> = (
             <button
               key={m}
               onClick={() => setSelectedMonth(m)}
-              className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer flex items-center gap-2 ${
+              className={`shrink-0 whitespace-nowrap px-3.5 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer flex items-center gap-2 ${
                 isSelected
                   ? 'bg-slate-900 text-white shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'

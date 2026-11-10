@@ -28,6 +28,10 @@ import { useAuth } from './context/AuthContext';
 import { useLanguage } from './context/LanguageContext';
 import { initAuth, googleSignIn, getAccessToken, logout } from './services/googleAuth';
 import {
+  subscribeToSocietyData,
+  saveSocietyDataToCloud,
+} from './services/firestoreSync';
+import {
   SheetMetadata,
   fetchSpreadsheetMetadata,
   createGoogleSpreadsheet,
@@ -63,7 +67,17 @@ export default function App() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed: ShareRecord[] = JSON.parse(saved);
-        return parsed.map((s) => syncShareRecordWithCalendar(s));
+        return parsed.map((s) => {
+          if (s.id === 'PAS-17' && (s.memberName === 'Member PAS-17' || !s.memberName)) {
+            return syncShareRecordWithCalendar({
+              ...s,
+              memberName: 'Md Rabby Sharder',
+              sl: '',
+              phone: s.phone === '+880 1719-012349' ? '+880 1718-901238' : s.phone || '+880 1718-901238',
+            });
+          }
+          return syncShareRecordWithCalendar(s);
+        });
       }
     } catch (e) {
       console.error('Failed to parse saved shares:', e);
@@ -151,6 +165,7 @@ export default function App() {
   const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [connectedSheet, setConnectedSheet] = useState<SheetMetadata | null>(null);
+  const [isCloudLive, setIsCloudLive] = useState<boolean>(false);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [autoSyncEnabled, setAutoSyncEnabled] = useState<boolean>(() => {
     try {
@@ -237,6 +252,78 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
+  // Migration: Ensure PAS-17 is mapped to Md Rabby Sharder across local state & cloud
+  useEffect(() => {
+    setShares((prev) => {
+      const hasOldPlaceholder = prev.some(
+        (s) => s.id === 'PAS-17' && (s.memberName === 'Member PAS-17' || !s.memberName)
+      );
+      if (!hasOldPlaceholder) return prev;
+
+      const updated = prev.map((s) => {
+        if (s.id === 'PAS-17' && (s.memberName === 'Member PAS-17' || !s.memberName)) {
+          return syncShareRecordWithCalendar({
+            ...s,
+            memberName: 'Md Rabby Sharder',
+            sl: '',
+            phone: s.phone === '+880 1719-012349' ? '+880 1718-901238' : s.phone || '+880 1718-901238',
+          });
+        }
+        return s;
+      });
+
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      } catch (e) {}
+      saveSocietyDataToCloud({ shares: updated }).catch(console.warn);
+      return updated;
+    });
+  }, []);
+
+  // Connect to Google Cloud Firestore Real-time synchronization
+  useEffect(() => {
+    const unsubscribe = subscribeToSocietyData(
+      (cloudData) => {
+        setIsCloudLive(true);
+        if (cloudData.shares && Array.isArray(cloudData.shares) && cloudData.shares.length > 0) {
+          const normalizedShares = cloudData.shares.map((s) => {
+            if (s.id === 'PAS-17' && (s.memberName === 'Member PAS-17' || !s.memberName)) {
+              return syncShareRecordWithCalendar({
+                ...s,
+                memberName: 'Md Rabby Sharder',
+                sl: '',
+                phone: s.phone === '+880 1719-012349' ? '+880 1718-901238' : s.phone || '+880 1718-901238',
+              });
+            }
+            return syncShareRecordWithCalendar(s);
+          });
+          setShares(normalizedShares);
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizedShares));
+          } catch (e) {}
+        }
+        if (cloudData.allConfiguredMonths && cloudData.allConfiguredMonths.length > 0) {
+          setAllConfiguredMonths(cloudData.allConfiguredMonths);
+          try {
+            localStorage.setItem('pas_configured_months_v1', JSON.stringify(cloudData.allConfiguredMonths));
+          } catch (e) {}
+        }
+        if (cloudData.activeMonths && cloudData.activeMonths.length > 0) {
+          setActiveMonths(cloudData.activeMonths);
+          try {
+            localStorage.setItem('pas_active_display_months_v1', JSON.stringify(cloudData.activeMonths));
+          } catch (e) {}
+        }
+      },
+      (err) => {
+        console.warn('[Firestore] Connection warning, continuing in local mode:', err);
+        setIsCloudLive(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
   // Toggle body class when a modal is open so print stylesheet isolates the modal perfectly
   useEffect(() => {
     if (isReceiptOpen || !!selectedMemberForDetail) {
@@ -249,9 +336,22 @@ export default function App() {
     };
   }, [isReceiptOpen, selectedMemberForDetail]);
 
-  // Auto-sync trigger on local changes
+  // Auto-sync trigger on local changes: pushes to Firestore Cloud immediately & Google Sheets if linked
   const triggerAutoSyncIfEnabled = useCallback(
-    async (updatedShares: ShareRecord[]) => {
+    async (updatedShares: ShareRecord[], newAllMonths?: string[], newActiveMonths?: string[]) => {
+      // 1. Instantly save to Cloud Firestore (so all members across Bangladesh see changes within 1 second)
+      try {
+        await saveSocietyDataToCloud({
+          shares: updatedShares,
+          allConfiguredMonths: newAllMonths || allConfiguredMonths,
+          activeMonths: newActiveMonths || activeMonths,
+          currentMonth,
+        });
+      } catch (cloudErr) {
+        console.warn('[Firestore] Auto-save to cloud failed:', cloudErr);
+      }
+
+      // 2. Push to Google Sheet if admin has connected a spreadsheet
       if (!autoSyncEnabled || !connectedSheet) return;
       try {
         const token = await getAccessToken();
@@ -272,7 +372,7 @@ export default function App() {
         setIsSyncing(false);
       }
     },
-    [autoSyncEnabled, connectedSheet]
+    [autoSyncEnabled, connectedSheet, allConfiguredMonths, activeMonths, currentMonth]
   );
 
   // Routing Handlers
@@ -326,7 +426,7 @@ export default function App() {
         }
       }
     } catch (err: any) {
-      showToast(`Google Sign-in: ${err?.message || 'Authentication cancelled'}`);
+      showToast(err?.message ? `Google Sign-in: ${err.message}` : 'Google Sign-in: Authentication cancelled');
     }
   };
 
@@ -386,7 +486,7 @@ export default function App() {
         console.warn('Styling update warning:', styleErr);
       }
       setLastSyncedAt(new Date());
-      showToast(`Successfully pushed 31 shares to "${connectedSheet.title}"!`);
+      showToast(`Successfully pushed ${shares.length} shares to "${connectedSheet.title}"!`);
     } finally {
       setIsSyncing(false);
     }
@@ -721,54 +821,108 @@ export default function App() {
       console.error(e);
     }
     setShares(INITIAL_SHARES);
+    saveSocietyDataToCloud({ shares: INITIAL_SHARES }).catch(console.warn);
     setIsResetConfirmOpen(false);
     showToast('Data reset back to original Progressive Association Society Excel ledger.');
   };
 
   const handleExportCSV = () => {
-    let csv = 'PROGRESSIVE ASSOCIATION SOCIETY\n';
-    csv += 'MEMBER PAYMENT & INSTALLMENT DASHBOARD\n';
-    csv += `TOTAL ACTIVE SHARES,"${summary.totalActiveShares} Shares",,,,TOTAL BANK DEPOSIT,"৳${summary.totalBankDeposit.toLocaleString('en-IN')}",,,,TOTAL OUTSTANDING DUE,"৳${summary.totalOutstandingDue.toLocaleString('en-IN')}",,,,COLLECTION EFFICIENCY,"${summary.collectionEfficiency}%"\n`;
-    csv += `30 Active Members (32 IDs),,,,"Admission: ৳${summary.totalAdmissionCollected.toLocaleString('en-IN')} | Monthly: ৳${summary.totalMonthlyCollected.toLocaleString('en-IN')} | Late Fee: ৳${summary.totalLateFeeCollected.toLocaleString('en-IN')}",,,,"Due: ৳${summary.totalDuePrincipal.toLocaleString('en-IN')} + Late Fee: ৳${summary.totalLateFeeDue.toLocaleString('en-IN')}"\n`;
-    csv += 'SL,Member Name,Share ID, Admission Fee ,Month of Aug-26,,Month of Sep-26,,Month of Oct-26,,Month of Nov-26,,Month of Dec-26,, Total Deposit ,Due Months,Due Amount,Late Fee / Fine,Total Due,Late Fee Paid\n';
-    csv += ',,,,Date, Amount ,Date, Amount ,Date, Amount ,Date, Amount ,Date, Amount ,,,,,,\n';
+    const escapeCsv = (val: unknown): string => {
+      if (val === undefined || val === null) return '';
+      const str = String(val);
+      if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
 
+    // Organized, self-describing column headers (Row 1)
+    const monthHeaders = activeMonths.flatMap((m) => [`${m} Date`, `${m} Amount (Tk)`]);
+    const headers = [
+      'SL',
+      'Member Name',
+      'Share ID',
+      'Phone Number',
+      'Admission Fee (Tk)',
+      ...monthHeaders,
+      'Total Deposit (Tk)',
+      'Due Months',
+      'Due Principal (Tk)',
+      'Late Fee (Tk)',
+      'Total Due (Tk)',
+      'Late Fee Paid (Tk)',
+      'Account Status',
+    ];
+
+    const rows: (string | number)[][] = [];
+
+    // Data rows (Row 2 to N+1)
     for (const s of shares) {
-      const aug = s.months['Aug-26'];
-      const sep = s.months['Sep-26'];
-      const oct = s.months['Oct-26'];
-      const nov = s.months['Nov-26'];
-      const dec = s.months['Dec-26'];
+      const monthCols: (string | number)[] = [];
+      for (const m of activeMonths) {
+        const monthData = s.months[m];
+        if (monthData?.status === 'paid') {
+          monthCols.push(monthData.date || 'Paid');
+          monthCols.push(monthData.amount);
+        } else if (monthData?.status === 'due') {
+          monthCols.push('Due');
+          monthCols.push(0);
+        } else {
+          monthCols.push('Upcoming');
+          monthCols.push(0);
+        }
+      }
 
-      const row = [
+      rows.push([
         s.sl || '',
-        `"${s.memberName}"`,
-        `"${s.id}"`,
-        `"${s.admissionFee.toLocaleString('en-IN')}"`,
-        aug?.status === 'paid' ? aug.date : aug?.status === 'due' ? 'Due' : '',
-        aug?.status === 'paid' ? `"${aug.amount.toLocaleString('en-IN')}"` : '',
-        sep?.status === 'paid' ? sep.date : sep?.status === 'due' ? 'Due' : '',
-        sep?.status === 'paid' ? `"${sep.amount.toLocaleString('en-IN')}"` : '',
-        oct?.status === 'paid' ? oct.date : oct?.status === 'due' ? 'Due' : '',
-        oct?.status === 'paid' ? `"${oct.amount.toLocaleString('en-IN')}"` : '',
-        nov?.status === 'paid' ? nov.date : nov?.status === 'due' ? 'Due' : '',
-        nov?.status === 'paid' ? `"${nov.amount.toLocaleString('en-IN')}"` : '',
-        dec?.status === 'paid' ? dec.date : dec?.status === 'due' ? 'Due' : '',
-        dec?.status === 'paid' ? `"${dec.amount.toLocaleString('en-IN')}"` : '',
-        `"${s.totalDeposit.toLocaleString('en-IN')}"`,
-        s.dueMonths > 0 ? s.dueMonths : '-',
-        s.dueAmount > 0 ? `"${s.dueAmount.toLocaleString('en-IN')}"` : '-',
-        s.lateFee > 0 ? s.lateFee : '-',
-        s.totalDue > 0 ? `"${s.totalDue.toLocaleString('en-IN')}"` : '-',
-        s.lateFeePaid > 0 ? s.lateFeePaid : '-',
-      ];
-      csv += row.join(',') + '\n';
+        s.memberName,
+        s.id,
+        s.phone || '',
+        s.admissionFee,
+        ...monthCols,
+        s.totalDeposit,
+        s.dueMonths,
+        s.dueAmount,
+        s.lateFee,
+        s.totalDue,
+        s.lateFeePaid,
+        s.isClosed ? 'Closed' : s.dueMonths > 0 ? 'Overdue' : 'Active',
+      ]);
     }
 
-    // Grand total row
-    csv += `,GRAND TOTAL,,"${summary.totalAdmissionCollected.toLocaleString('en-IN')}",,"${summary.monthStats['Aug-26'].paidAmount.toLocaleString('en-IN')}",,"${summary.monthStats['Sep-26'].paidAmount.toLocaleString('en-IN')}",,"${summary.monthStats['Oct-26'].paidAmount.toLocaleString('en-IN')}",,,,,,"${summary.totalBankDeposit.toLocaleString('en-IN')}",${summary.totalDueMonths},"${summary.totalDuePrincipal.toLocaleString('en-IN')}",${summary.totalLateFeeDue},"${summary.totalOutstandingDue.toLocaleString('en-IN')}",-\n`;
+    // Grand total summary row matching the exact rectangular column structure
+    const totalMonthCols: (string | number)[] = [];
+    for (const m of activeMonths) {
+      const stat = summary.monthStats?.[m];
+      totalMonthCols.push(stat?.paidShares ? `${stat.paidShares} Paid` : '0 Paid');
+      totalMonthCols.push(stat?.paidAmount || 0);
+    }
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const grandTotalRow: (string | number)[] = [
+      '',
+      'GRAND TOTAL',
+      `${summary.totalActiveShares} Active Shares`,
+      '',
+      summary.totalAdmissionCollected,
+      ...totalMonthCols,
+      summary.totalBankDeposit,
+      summary.totalDueMonths,
+      summary.totalDuePrincipal,
+      summary.totalLateFeeDue,
+      summary.totalOutstandingDue,
+      summary.totalLateFeeCollected,
+      `Active: ${summary.totalActiveShares} | Due Months: ${summary.totalDueMonths}`,
+    ];
+
+    // Build standard CSV with UTF-8 Byte Order Mark (BOM) for Excel
+    const allLines = [
+      headers.map(escapeCsv).join(','),
+      ...rows.map((r) => r.map(escapeCsv).join(',')),
+      grandTotalRow.map(escapeCsv).join(','),
+    ];
+    const csvContent = '\uFEFF' + allLines.join('\r\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
@@ -779,7 +933,14 @@ export default function App() {
   };
 
   const handlePrint = () => {
-    window.print();
+    if (activeTab !== 'ledger') {
+      setActiveTab('ledger');
+      setTimeout(() => {
+        window.print();
+      }, 150);
+    } else {
+      window.print();
+    }
   };
 
   const handleExportJSON = () => {
@@ -816,6 +977,7 @@ export default function App() {
           );
           setShares(restoredShares);
           localStorage.setItem(STORAGE_KEY, JSON.stringify(restoredShares));
+          saveSocietyDataToCloud({ shares: restoredShares }).catch(console.warn);
           showToast(`Successfully restored ${restoredShares.length} shares from JSON backup!`);
         } catch (err: any) {
           alert('Failed to import JSON backup: ' + (err?.message || 'Unknown error'));
@@ -848,16 +1010,39 @@ export default function App() {
         onExportCSV={() => requireAdmin(handleExportCSV, 'export ledger to CSV')}
         onExportJSON={() => requireAdmin(handleExportJSON, 'export JSON backup')}
         onImportJSON={handleImportJSON}
-        onPrint={() => requireAdmin(handlePrint, 'print dashboard report')}
+        onPrint={handlePrint}
         onResetData={() => requireAdmin(() => setIsResetConfirmOpen(true), 'reset ledger data')}
         isSheetConnected={!!connectedSheet}
         isSyncing={isSyncing}
         sheetTitle={connectedSheet?.title}
         onOpenSyncModal={() => requireAdmin(() => setIsSyncModalOpen(true), 'sync with Google Sheets')}
+        isCloudLive={isCloudLive}
       />
 
       {/* Main Container */}
-      <main className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 py-6 space-y-6">
+      <main className="w-full px-3 sm:px-6 lg:px-8 xl:px-10 py-3.5 sm:py-6 space-y-4 sm:space-y-6">
+        {/* Official Printable Statement Letterhead (Visible on print / PDF only) */}
+        <div className="hidden print:block mb-4 pb-3 border-b-2 border-slate-800 font-sans">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-black text-slate-900 tracking-tight">
+                Progressive Association Society
+              </h1>
+              <p className="text-xs font-semibold text-slate-700 mt-1">
+                Official Share & Installment Ledger Statement (কেন্দ্রীয় হিসাব ও কিস্তি লেজার)
+              </p>
+              <p className="text-[10px] text-slate-500">
+                Estd 2026, Registered Co-operative Society, 5-Year Land Investment Project
+              </p>
+            </div>
+            <div className="text-right text-[10px] text-slate-700 space-y-0.5">
+              <div>Print Date: <span className="font-mono font-bold">{new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span></div>
+              <div>Billing Months: <span className="font-mono font-bold">{activeMonths.join(', ')}</span></div>
+              <div>Report Type: <strong className="text-emerald-800 font-bold">Verified Society Master Ledger</strong></div>
+            </div>
+          </div>
+        </div>
+
         {/* KPI Summary Cards */}
         <SummaryCards
           summary={summary}
@@ -871,13 +1056,12 @@ export default function App() {
         />
 
         {/* View Switcher & Filter Bar */}
-        <div className="bg-white rounded-xl border border-slate-200 p-3 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Tab buttons */}
-          {/* Segmented View Tabs */}
-          <div className="flex items-center flex-wrap gap-1 bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 shadow-2xs">
+        <div className="bg-white rounded-xl border border-slate-200 p-2 sm:p-3 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-2.5 sm:gap-3 print:hidden">
+          {/* Segmented View Tabs - Horizontal Swipe on Mobile */}
+          <div className="flex items-center overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex-nowrap sm:flex-wrap gap-1 bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 shadow-2xs w-full md:w-auto shrink-0">
             <button
               onClick={() => setActiveTab('ledger')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none active:scale-95 ${
+              className={`shrink-0 whitespace-nowrap px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none active:scale-95 ${
                 activeTab === 'ledger'
                   ? 'bg-emerald-600 text-white shadow-xs ring-1 ring-emerald-700/40'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
@@ -889,7 +1073,7 @@ export default function App() {
 
             <button
               onClick={() => setActiveTab('cards')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none active:scale-95 ${
+              className={`shrink-0 whitespace-nowrap px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none active:scale-95 ${
                 activeTab === 'cards'
                   ? 'bg-blue-600 text-white shadow-xs ring-1 ring-blue-700/40'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
@@ -901,7 +1085,7 @@ export default function App() {
 
             <button
               onClick={() => setActiveTab('months')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:outline-none active:scale-95 ${
+              className={`shrink-0 whitespace-nowrap px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:outline-none active:scale-95 ${
                 activeTab === 'months'
                   ? 'bg-teal-600 text-white shadow-xs ring-1 ring-teal-700/40'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
@@ -913,7 +1097,7 @@ export default function App() {
 
             <button
               onClick={() => setActiveTab('defaulters')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none active:scale-95 ${
+              className={`shrink-0 whitespace-nowrap px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none active:scale-95 ${
                 activeTab === 'defaulters'
                   ? 'bg-rose-600 text-white shadow-xs ring-1 ring-rose-700/40'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
@@ -930,7 +1114,7 @@ export default function App() {
 
             <button
               onClick={() => setActiveTab('members')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:outline-none active:scale-95 ${
+              className={`shrink-0 whitespace-nowrap px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:outline-none active:scale-95 ${
                 activeTab === 'members'
                   ? 'bg-slate-900 text-white shadow-xs ring-1 ring-slate-950'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
@@ -942,7 +1126,7 @@ export default function App() {
 
             <button
               onClick={() => setActiveTab('deeds')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none active:scale-95 ${
+              className={`shrink-0 whitespace-nowrap px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none active:scale-95 ${
                 activeTab === 'deeds'
                   ? 'bg-amber-600 text-white shadow-xs ring-1 ring-amber-700/40'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
@@ -960,12 +1144,12 @@ export default function App() {
 
           {/* Search & Status Filters */}
           {(activeTab === 'ledger' || activeTab === 'cards') && (
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
               {/* Status chips */}
-              <div className="flex items-center gap-1 text-xs">
+              <div className="flex items-center gap-1 text-xs overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex-nowrap shrink-0">
                 <button
                   onClick={() => setStatusFilter('all')}
-                  className={`px-2.5 py-1 rounded-lg font-bold cursor-pointer transition-colors duration-150 ${
+                  className={`shrink-0 px-2.5 py-1 rounded-lg font-bold cursor-pointer transition-colors duration-150 ${
                     statusFilter === 'all'
                       ? 'bg-slate-900 text-white shadow-2xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -975,45 +1159,45 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => setStatusFilter('overdue')}
-                  className={`px-2.5 py-1 rounded-lg font-bold cursor-pointer transition-colors duration-150 ${
+                  className={`shrink-0 px-2.5 py-1 rounded-lg font-bold cursor-pointer transition-colors duration-150 ${
                     statusFilter === 'overdue'
                       ? 'bg-rose-600 text-white shadow-2xs'
                       : 'bg-rose-50 text-rose-700 hover:bg-rose-100'
                   }`}
                 >
-                  {t('filterDue')} (3)
+                  {t('filterDue')} ({shares.filter((s) => !s.isClosed && s.dueMonths > 0).length})
                 </button>
                 <button
                   onClick={() => setStatusFilter('paid')}
-                  className={`px-2.5 py-1 rounded-lg font-bold cursor-pointer transition-colors duration-150 ${
+                  className={`shrink-0 px-2.5 py-1 rounded-lg font-bold cursor-pointer transition-colors duration-150 ${
                     statusFilter === 'paid'
                       ? 'bg-emerald-600 text-white shadow-2xs'
                       : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
                   }`}
                 >
-                  {t('filterPaid')} (27)
+                  {t('filterPaid')} ({shares.filter((s) => !s.isClosed && s.dueMonths === 0).length})
                 </button>
                 <button
                   onClick={() => setStatusFilter('closed')}
-                  className={`px-2.5 py-1 rounded-lg font-bold cursor-pointer transition-colors duration-150 ${
+                  className={`shrink-0 px-2.5 py-1 rounded-lg font-bold cursor-pointer transition-colors duration-150 ${
                     statusFilter === 'closed'
                       ? 'bg-slate-700 text-white shadow-2xs'
                       : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                   }`}
                 >
-                  {t('filterClosed')} (1)
+                  {t('filterClosed')} ({shares.filter((s) => s.isClosed).length})
                 </button>
               </div>
 
               {/* Search input */}
-              <div className="relative">
+              <div className="relative flex-1 sm:w-48 md:w-56">
                 <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t('searchPlaceholder')}
-                  className="w-full sm:w-48 pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-300 focus:outline-emerald-500 focus:ring-2 focus:ring-emerald-500/20 bg-white shadow-2xs"
+                  className="w-full pl-8 pr-7 py-1.5 text-xs rounded-xl border border-slate-300 focus:outline-emerald-500 focus:ring-2 focus:ring-emerald-500/20 bg-white shadow-2xs"
                 />
                 {searchQuery && (
                   <button
@@ -1091,6 +1275,26 @@ export default function App() {
           <LandDocumentsView />
         )}
       </main>
+
+      {/* Official System Footer with Developer Credit */}
+      <footer className="w-full border-t border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 py-4 px-4 sm:px-8 text-center text-xs text-slate-500 dark:text-slate-400 print:hidden mt-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 max-w-7xl mx-auto">
+          <span className="font-semibold text-slate-700 dark:text-slate-300">
+            Progressive Association Society (PAS) © 2026
+          </span>
+          <div className="flex items-center gap-1.5">
+            <span>Developed by</span>
+            <a
+              href="https://www.facebook.com/adu77"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300 underline underline-offset-2 transition-colors cursor-pointer"
+            >
+              Adnan Taher
+            </a>
+          </div>
+        </div>
+      </footer>
 
       {/* Record Payment Modal */}
       <RecordPaymentModal

@@ -215,7 +215,7 @@ const rawShares: Omit<ShareRecord, 'totalDeposit' | 'dueMonths' | 'dueAmount' | 
     },
   },
 
-  // 07: Md Rabby Sharder
+  // 07: Md Rabby Sharder (2 shares: PAS-16, PAS-17)
   {
     id: 'PAS-16',
     sl: '07',
@@ -230,13 +230,11 @@ const rawShares: Omit<ShareRecord, 'totalDeposit' | 'dueMonths' | 'dueAmount' | 
       'Dec-26': defaultUpcoming(),
     },
   },
-
-  // 08: Member Slot 08 (blank in sheet, marked as PAS-17)
   {
     id: 'PAS-17',
-    sl: '08',
-    memberName: 'Member PAS-17',
-    phone: '+880 1719-012349',
+    sl: '',
+    memberName: 'Md Rabby Sharder',
+    phone: '+880 1718-901238',
     admissionFee: 5000,
     months: {
       'Aug-26': defaultPaid('15.08.26'),

@@ -156,9 +156,7 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
   };
 
   const handlePrint = () => {
-    requireAdmin(() => {
-      window.print();
-    }, 'print member portfolio statement');
+    window.print();
   };
 
   // Filter shares for installment table

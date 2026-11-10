@@ -16,7 +16,6 @@ import {
   Link,
   ShieldCheck,
   ClipboardPaste,
-  Info,
 } from 'lucide-react';
 
 interface GoogleSheetSyncModalProps {
@@ -141,93 +140,84 @@ export const GoogleSheetSyncModal: React.FC<GoogleSheetSyncModalProps> = ({
       }}
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75"
     >
-      <div className="relative w-full max-w-xl max-h-[92vh] flex flex-col bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+      <div className="relative w-full max-w-xl max-h-[92vh] flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
         {/* Header */}
-        <div className="shrink-0 px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+        <div className="shrink-0 px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/90 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-xs">
-              <FileSpreadsheet className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-xs">
+              <FileSpreadsheet className="w-4 h-4" />
             </div>
-            <div>
-              <h3 className="font-bold text-slate-900 text-sm sm:text-base">
-                Google Sheets Live Sync
-              </h3>
-              <p className="text-[11px] text-slate-500">
-                Two-way synchronization between Portal Dashboard &amp; Google Sheet
-              </p>
-            </div>
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base">
+              {isBn ? 'গুগল শিট সিঙ্ক' : 'Google Sheets Sync'}
+            </h3>
           </div>
           <button
             onClick={onClose}
             aria-label="Close sync modal"
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer"
+            className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4">
           {errorMsg && (
-            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-2.5 text-xs text-rose-800">
+            <div className="p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 rounded-xl flex items-start gap-2.5 text-xs text-rose-800 dark:text-rose-200">
               <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
               <span>{errorMsg}</span>
             </div>
           )}
 
-          {/* Section 1: Google Account Status */}
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          {/* Section 1: Google Account */}
+          <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3">
             {currentUser ? (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5 min-w-0">
                 {currentUser.photoURL ? (
                   <img
                     src={currentUser.photoURL}
                     alt={currentUser.displayName || 'Google User'}
-                    className="w-10 h-10 rounded-full border border-slate-300"
+                    className="w-8 h-8 rounded-full border border-slate-300 dark:border-slate-600 shrink-0"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center">
-                    {currentUser.displayName?.[0] || 'U'}
+                  <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                    {currentUser.displayName?.[0] || 'G'}
                   </div>
                 )}
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-slate-900 text-xs sm:text-sm">
-                      {currentUser.displayName || 'Authorized Admin'}
-                    </span>
-                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-100 text-emerald-800 font-semibold">
-                      Connected
-                    </span>
-                  </div>
-                  <span className="text-[11px] text-slate-500 block">{currentUser.email}</span>
+                <div className="min-w-0">
+                  <span className="font-bold text-slate-900 dark:text-slate-100 text-xs block truncate">
+                    {currentUser.displayName || currentUser.email}
+                  </span>
+                  <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                    {isBn ? 'কানেক্টেড' : 'Connected'}
+                  </span>
                 </div>
               </div>
             ) : (
-              <div>
-                <span className="font-bold text-slate-900 text-xs sm:text-sm block">
-                  Google Workspace Authentication
-                </span>
-                <span className="text-[11px] text-slate-500">
-                  Sign in with Google to enable two-way sync with Google Sheets
-                </span>
+              <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
+                <span className="w-2 h-2 rounded-full bg-slate-400 shrink-0" />
+                <span className="font-medium">{isBn ? 'গুগল অ্যাকাউন্ট সাইন ইন করা নেই' : 'Google Account not connected'}</span>
               </div>
             )}
 
             <div>
               {currentUser ? (
                 <button
+                  type="button"
                   onClick={onSignOut}
-                  className="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-200 text-slate-700 text-xs font-medium inline-flex items-center gap-1.5 cursor-pointer"
+                  className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-medium inline-flex items-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <LogOut className="w-3.5 h-3.5" />
-                  <span>Disconnect Account</span>
+                  <span>{isBn ? 'সাইন আউট' : 'Sign out'}</span>
                 </button>
               ) : (
                 <button
+                  type="button"
                   onClick={onSignIn}
-                  className="px-4 py-2 rounded-lg bg-white border border-slate-300 hover:border-slate-400 text-slate-800 font-semibold text-xs shadow-xs inline-flex items-center gap-2 cursor-pointer transition-colors duration-150"
+                  className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:border-slate-400 dark:hover:border-slate-500 text-slate-800 dark:text-slate-100 font-semibold text-xs shadow-2xs inline-flex items-center gap-2 cursor-pointer transition-colors"
                 >
-                  <svg className="w-4 h-4" viewBox="0 0 48 48" aria-hidden="true">
+                  <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 48 48" aria-hidden="true">
                     <path
                       fill="#EA4335"
                       d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
@@ -245,7 +235,7 @@ export const GoogleSheetSyncModal: React.FC<GoogleSheetSyncModalProps> = ({
                       d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
                     />
                   </svg>
-                  <span>Sign in with Google</span>
+                  <span>{isBn ? 'সাইন ইন' : 'Sign in'}</span>
                 </button>
               )}
             </div>
@@ -253,58 +243,59 @@ export const GoogleSheetSyncModal: React.FC<GoogleSheetSyncModalProps> = ({
 
           {/* Section 2: Connected Sheet Status or Connection Options */}
           {connectedSheet ? (
-            <div className="space-y-4">
-              <div className="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl">
+            <div className="space-y-3.5">
+              <div className="p-3.5 bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
+                  <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse motion-reduce:animate-none" />
-                      <span className="text-xs font-semibold text-emerald-800">
-                        Active Google Sheet
+                      <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+                        {isBn ? 'সংযুক্ত গুগল শিট' : 'Active Google Sheet'}
                       </span>
                     </div>
-                    <h4 className="font-bold text-slate-900 text-sm sm:text-base mt-0.5">
+                    <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm mt-0.5 truncate">
                       {connectedSheet.title}
                     </h4>
-                    <p className="text-[11px] text-slate-500 font-mono mt-0.5 truncate max-w-sm">
-                      ID: {connectedSheet.id}
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate max-w-sm">
+                      ID: <span className="font-mono">{connectedSheet.id}</span>
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0">
                     <a
                       href={connectedSheet.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-xs inline-flex items-center gap-1.5 cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-2xs inline-flex items-center gap-1.5 cursor-pointer transition-colors"
                     >
-                      <span>Open in Sheets</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>{isBn ? 'শিট খুলুন' : 'Open Sheet'}</span>
+                      <ExternalLink className="w-3 h-3" />
                     </a>
                     <button
+                      type="button"
                       onClick={onDisconnectSheet}
-                      className="px-2.5 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-600 text-xs font-medium cursor-pointer"
+                      className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium cursor-pointer transition-colors"
                       title="Unlink this spreadsheet"
                     >
-                      Unlink
+                      {isBn ? 'আনলিংক' : 'Unlink'}
                     </button>
                   </div>
                 </div>
 
                 {/* Last synced status */}
-                <div className="mt-3 pt-3 border-t border-emerald-200/60 flex items-center justify-between text-xs text-slate-600">
-                  <span className="inline-flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <div className="mt-2.5 pt-2.5 border-t border-emerald-200/60 dark:border-emerald-800/60 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
+                  <span className="inline-flex items-center gap-1.5 text-[11px]">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                     <span>
                       {lastSyncedAt
-                        ? `Last synced: ${lastSyncedAt.toLocaleTimeString()}`
-                        : 'Ready to synchronize'}
+                        ? `${isBn ? 'সর্বশেষ সিঙ্ক' : 'Last synced'}: ${lastSyncedAt.toLocaleTimeString()}`
+                        : (isBn ? 'সিঙ্কের জন্য প্রস্তুত' : 'Ready to sync')}
                     </span>
                   </span>
                   {isSyncing && (
-                    <span className="inline-flex items-center gap-1 text-emerald-700 font-medium animate-pulse">
+                    <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-semibold text-[11px] animate-pulse">
                       <RefreshCw className="w-3 h-3 animate-spin" />
-                      <span>Syncing...</span>
+                      <span>{isBn ? 'সিঙ্ক হচ্ছে…' : 'Syncing…'}</span>
                     </span>
                   )}
                 </div>
@@ -313,50 +304,56 @@ export const GoogleSheetSyncModal: React.FC<GoogleSheetSyncModalProps> = ({
               {/* Two-Way Action Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Pull Action Card */}
-                <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-2">
-                  <div className="flex items-center gap-2 font-bold text-slate-900 text-xs sm:text-sm">
-                    <DownloadCloud className="w-4 h-4 text-blue-600" />
-                    <span>Pull from Google Sheet</span>
+                <div className="p-3.5 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xs flex flex-col justify-between space-y-2">
+                  <div>
+                    <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-slate-100 text-xs">
+                      <DownloadCloud className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                      <span>{isBn ? 'শিট থেকে আনুন' : 'Pull from Sheet'}</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                      {isBn ? 'গুগল শিটের পরিবর্তন ড্যাশবোর্ডে লোড করবে।' : 'Import changes edited in the Google Sheet.'}
+                    </p>
                   </div>
-                  <p className="text-[11px] text-slate-500 leading-relaxed">
-                    Import changes edited in the Google Sheet directly into the dashboard.
-                  </p>
                   <button
+                    type="button"
                     onClick={() => setConfirmAction('pull')}
                     disabled={isSyncing}
-                    className="w-full mt-1 px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs border border-blue-200 transition-colors cursor-pointer disabled:opacity-50"
+                    className="w-full mt-1 py-1.5 px-3 rounded-lg bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-bold text-xs border border-blue-200 dark:border-blue-800 transition-colors cursor-pointer disabled:opacity-50"
                   >
-                    Pull Latest from Sheet
+                    {isBn ? 'ডাটা পুল করুন' : 'Pull Data'}
                   </button>
                 </div>
 
                 {/* Push Action Card */}
-                <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-2">
-                  <div className="flex items-center gap-2 font-bold text-slate-900 text-xs sm:text-sm">
-                    <UploadCloud className="w-4 h-4 text-emerald-600" />
-                    <span>Push to Google Sheet</span>
+                <div className="p-3.5 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xs flex flex-col justify-between space-y-2">
+                  <div>
+                    <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-slate-100 text-xs">
+                      <UploadCloud className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <span>{isBn ? 'শিটে পাঠান' : 'Push to Sheet'}</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                      {isBn ? 'ড্যাশবোর্ডের পেমেন্ট রেকর্ড গুগল শিটে পাঠাবে।' : 'Upload dashboard records to Google Sheet.'}
+                    </p>
                   </div>
-                  <p className="text-[11px] text-slate-500 leading-relaxed">
-                    Update the Google Sheet with all current dashboard payments &amp; dues.
-                  </p>
                   <button
+                    type="button"
                     onClick={() => setConfirmAction('push')}
                     disabled={isSyncing}
-                    className="w-full mt-1 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                    className="w-full mt-1 py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
                   >
-                    Push Dashboard to Sheet
+                    {isBn ? 'ডাটা পুশ করুন' : 'Push Data'}
                   </button>
                 </div>
               </div>
 
               {/* Auto-Sync Toggle */}
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+              <div className="p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-between">
                 <div>
-                  <span className="font-semibold text-slate-800 text-xs block">
-                    Automatic Sync on Update
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs block">
+                    {isBn ? 'অটো-সিঙ্ক (Auto-Sync)' : 'Auto-Sync on Update'}
                   </span>
-                  <span className="text-[11px] text-slate-500">
-                    Automatically push to Google Sheet when recording a payment or clearing dues
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                    {isBn ? 'পেমেন্ট রেকর্ড আপডেট হলে স্বয়ংক্রিয়ভাবে শিটে সিঙ্ক হবে' : 'Automatically sync to Google Sheet when payments update'}
                   </span>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -366,65 +363,59 @@ export const GoogleSheetSyncModal: React.FC<GoogleSheetSyncModalProps> = ({
                     onChange={(e) => onToggleAutoSync(e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-transform duration-150 peer-checked:bg-emerald-600"></div>
+                  <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-transform duration-150 peer-checked:bg-emerald-600"></div>
                 </label>
               </div>
             </div>
           ) : (
             /* When No Sheet is Connected */
-            <div className="space-y-4">
-              <div className="p-4 bg-blue-50/60 border border-blue-200 rounded-xl flex items-start gap-3">
-                <FileSpreadsheet className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-                <div className="text-xs text-blue-900 space-y-1">
-                  <span className="font-bold block">Connect with Google Sheets</span>
-                  <p className="text-blue-800/80 leading-relaxed">
-                    Choose whether you want to create a brand new Google Sheet in your Drive, or link to an existing spreadsheet.
+            <div className="space-y-3.5">
+              {/* Option A: Create New Sheet */}
+              <div className="p-4 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xs flex items-center justify-between gap-3">
+                <div className="space-y-0.5 min-w-0">
+                  <h4 className="font-bold text-slate-900 dark:text-slate-100 text-xs sm:text-sm flex items-center gap-1.5">
+                    <Plus className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <span>{isBn ? 'নতুন গুগল শিট তৈরি করুন' : 'Create New Google Sheet'}</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    {isBn
+                      ? 'আপনার গুগল ড্রাইভে নতুন রেজিস্টার শিট তৈরি করবে।'
+                      : 'Creates a formatted register in your Google Drive.'}
                   </p>
                 </div>
+                <button
+                  type="button"
+                  onClick={handleCreateNew}
+                  disabled={isCreating}
+                  className="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-2xs transition-colors cursor-pointer disabled:opacity-50 shrink-0"
+                >
+                  {isCreating
+                    ? (isBn ? 'তৈরি হচ্ছে…' : 'Creating…')
+                    : (isBn ? 'তৈরি করুন' : 'Create Sheet')}
+                </button>
               </div>
 
-              {/* Option A: Create New Sheet */}
-              <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-2">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <h4 className="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
-                      <Plus className="w-4 h-4 text-emerald-600" />
-                      <span>{isBn ? 'নতুন গুগল শিট তৈরি করুন' : 'Create New Google Sheet'}</span>
-                    </h4>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
-                      {isBn
-                        ? 'আপনার গুগল ড্রাইভে স্বয়ংক্রিয়ভাবে একটি নতুন প্রগ্রেসিভ রেজিস্টার শিট তৈরি করবে।'
-                        : 'Instantly generates a formatted 2026-27 Progressive Association Society Register in your Drive.'}
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleCreateNew}
-                    disabled={isCreating}
-                    className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer disabled:opacity-50 shrink-0"
-                  >
-                    {isCreating
-                      ? (isBn ? 'তৈরি হচ্ছে...' : 'Creating...')
-                      : (isBn ? 'তৈরি ও লিংক' : 'Create & Link')}
-                  </button>
-                </div>
-                {!currentUser && (
-                  <p className="text-[10px] text-amber-700 italic">
-                    *{isBn ? 'ক্লিক করলে গুগল অ্যাকাউন্ট সাইন-ইন প্রম্পট আসবে।' : 'Google account sign-in prompt will appear upon clicking.'}
-                  </p>
-                )}
+              {/* Divider */}
+              <div className="relative flex items-center justify-center">
+                <div className="border-t border-slate-200 dark:border-slate-700 w-full" />
+                <span className="bg-white dark:bg-slate-900 px-2.5 text-xs font-semibold text-slate-400 absolute">
+                  {isBn ? 'অথবা' : 'or'}
+                </span>
               </div>
 
               {/* Option B: Link Existing Sheet */}
-              <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-2">
-                <h4 className="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-1.5 mb-1">
-                  <Link className="w-4 h-4 text-blue-600" />
-                  <span>{isBn ? 'বিদ্যমান গুগল শিট লিংক করুন' : 'Link Existing Google Sheet'}</span>
-                </h4>
-                <p className="text-[11px] text-slate-500 mb-3">
-                  {isBn
-                    ? 'আপনার বিদ্যমান গুগল শিটের লিংক বা স্প্রেডশিট আইডি নিচে পেস্ট করুন:'
-                    : 'Paste the URL or Spreadsheet ID of your existing Google Sheet.'}
-                </p>
+              <div className="p-4 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xs space-y-2">
+                <div>
+                  <h4 className="font-bold text-slate-900 dark:text-slate-100 text-xs sm:text-sm flex items-center gap-1.5">
+                    <Link className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                    <span>{isBn ? 'বিদ্যমান গুগল শিট লিংক করুন' : 'Link Existing Google Sheet'}</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    {isBn
+                      ? 'গুগল শিটের লিংক পেস্ট করুন:'
+                      : 'Paste your Google Sheet URL:'}
+                  </p>
+                </div>
                 <form onSubmit={handleLinkSubmit} className="space-y-2">
                   <div className="flex gap-2">
                     <div className="relative flex-1">
@@ -433,39 +424,28 @@ export const GoogleSheetSyncModal: React.FC<GoogleSheetSyncModalProps> = ({
                         type="text"
                         value={sheetInput}
                         onChange={(e) => setSheetInput(e.target.value)}
-                        placeholder="https://docs.google.com/spreadsheets/d/1BxiMVs0X..."
-                        className="w-full px-3 py-2 pr-20 border border-slate-300 rounded-lg text-xs font-mono focus:outline-emerald-500 bg-white text-slate-900"
+                        placeholder="https://docs.google.com/spreadsheets/d/..."
+                        className="w-full px-3 py-2 pr-16 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-mono focus:outline-emerald-500 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100"
                       />
                       <button
                         type="button"
                         onClick={handlePasteFromClipboard}
-                        className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold flex items-center gap-1 border border-slate-200 cursor-pointer transition-colors"
-                        title={isBn ? 'ক্লিপবোর্ড থেকে পেস্ট করুন' : 'Paste link from clipboard'}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[11px] font-semibold flex items-center gap-1 border border-slate-200 dark:border-slate-700 cursor-pointer transition-colors"
+                        title={isBn ? 'ক্লিপবোর্ড থেকে পেস্ট করুন' : 'Paste from clipboard'}
                       >
-                        <ClipboardPaste className="w-3.5 h-3.5 text-blue-600" />
+                        <ClipboardPaste className="w-3 h-3 text-blue-600 dark:text-blue-400" />
                         <span>{isBn ? 'পেস্ট' : 'Paste'}</span>
                       </button>
                     </div>
                     <button
                       type="submit"
                       disabled={isLinking || !sheetInput.trim()}
-                      className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-colors cursor-pointer disabled:opacity-50 shrink-0"
+                      className="px-4 py-2 rounded-lg bg-slate-900 dark:bg-emerald-600 hover:bg-slate-800 dark:hover:bg-emerald-500 text-white font-bold text-xs transition-colors cursor-pointer disabled:opacity-50 shrink-0"
                     >
                       {isLinking
-                        ? (isBn ? 'সংযোগ হচ্ছে...' : 'Connecting...')
-                        : (isBn ? 'কানেক্ট করুন' : 'Connect')}
+                        ? (isBn ? 'সংযোগ হচ্ছে…' : 'Connecting…')
+                        : (isBn ? 'কানেক্ট' : 'Connect')}
                     </button>
-                  </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-slate-500 gap-1">
-                    <span className="flex items-center gap-1">
-                      <Info className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                      <span>{isBn ? 'গুগল শিট থেকে লিংক কপি করে এখানে পেস্ট বা পেস্ট বাটনে চাপুন।' : 'Copy link from your Google Sheet browser tab and paste here.'}</span>
-                    </span>
-                    {!currentUser && (
-                      <span className="text-amber-700 font-medium">
-                        *{isBn ? 'কানেক্টে চাপলে গুগল লগইন করতে হবে' : 'Google sign-in required on Connect'}
-                      </span>
-                    )}
                   </div>
                 </form>
               </div>
@@ -474,16 +454,17 @@ export const GoogleSheetSyncModal: React.FC<GoogleSheetSyncModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-          <span className="flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Encrypted OAuth2 Workspace Connection</span>
+        <div className="shrink-0 px-6 py-3.5 bg-slate-50 dark:bg-slate-900/90 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+          <span className="flex items-center gap-1.5 text-[11px]">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span>{isBn ? 'নিরাপদ গুগল ক্লাউড সংযোগ' : 'Encrypted Google Cloud Connection'}</span>
           </span>
           <button
+            type="button"
             onClick={onClose}
-            className="px-4 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer"
+            className="px-3.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium text-xs cursor-pointer transition-colors"
           >
-            Close
+            {isBn ? 'বন্ধ করুন' : 'Close'}
           </button>
         </div>
       </div>
@@ -491,13 +472,13 @@ export const GoogleSheetSyncModal: React.FC<GoogleSheetSyncModalProps> = ({
       {/* Mandatory User Confirmation Dialog for Mutating Workspace Operations */}
       {confirmAction && (
         <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/75">
-          <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-300 p-6 animate-in fade-in zoom-in-95 duration-150">
+          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-300 dark:border-slate-700 p-6 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center gap-3 mb-3">
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
                   confirmAction === 'push'
-                    ? 'bg-emerald-100 text-emerald-700'
-                    : 'bg-blue-100 text-blue-700'
+                    ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300'
+                    : 'bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300'
                 }`}
               >
                 {confirmAction === 'push' ? (
@@ -507,12 +488,12 @@ export const GoogleSheetSyncModal: React.FC<GoogleSheetSyncModalProps> = ({
                 )}
               </div>
               <div>
-                <h4 className="font-bold text-slate-900 text-base">
+                <h4 className="font-bold text-slate-900 dark:text-slate-100 text-base">
                   {confirmAction === 'push'
                     ? 'Update Google Sheet Data?'
                     : 'Update Dashboard from Google Sheet?'}
                 </h4>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   {confirmAction === 'push'
                     ? 'Confirm synchronization to Google Drive'
                     : 'Confirm reading spreadsheet updates'}
@@ -520,7 +501,7 @@ export const GoogleSheetSyncModal: React.FC<GoogleSheetSyncModalProps> = ({
               </div>
             </div>
 
-            <p className="text-xs text-slate-600 leading-relaxed mb-6">
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
               {confirmAction === 'push'
                 ? `Are you sure you want to push current dashboard records into "${connectedSheet?.title}"? This will overwrite the values in your Google Sheet with the latest dashboard payments and dues.`
                 : `Are you sure you want to pull and apply the latest values from "${connectedSheet?.title}"? This will update local dashboard records with any changes made directly in the spreadsheet.`}
@@ -530,7 +511,7 @@ export const GoogleSheetSyncModal: React.FC<GoogleSheetSyncModalProps> = ({
               <button
                 type="button"
                 onClick={() => setConfirmAction(null)}
-                className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium text-xs transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium text-xs transition-colors cursor-pointer"
               >
                 Cancel
               </button>

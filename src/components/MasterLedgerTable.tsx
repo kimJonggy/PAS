@@ -57,14 +57,14 @@ export const MasterLedgerTable: React.FC<MasterLedgerTableProps> = ({
   const isCurrentMonthOnly = activeMonths.length === 1 && activeMonths[0] === currentMonth;
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xs overflow-hidden">
       {/* Table toolbar / header info */}
-      <div className="px-5 py-3.5 border-b border-slate-200 bg-slate-50/80 flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="px-5 py-3.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/90 flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div>
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <span>{t('ledgerTitle')}</span>
-              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                 {shares.length} {t('records')}
               </span>
             </h2>
@@ -77,10 +77,10 @@ export const MasterLedgerTable: React.FC<MasterLedgerTableProps> = ({
           <div
             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold border cursor-pointer hover:opacity-90 shadow-2xs ${
               currentPenaltyStage.stage === 1
-                ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
+                ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-300'
                 : currentPenaltyStage.stage === 2
-                ? 'bg-amber-50 border-amber-300 text-amber-900'
-                : 'bg-rose-50 border-rose-300 text-rose-900'
+                ? 'bg-amber-50 dark:bg-amber-950/60 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-300'
+                : 'bg-rose-50 dark:bg-rose-950/60 border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-300'
             }`}
             title={`${currentPenaltyStage.description} — Click on any Due/Fee cell in the table to see the full calculation breakdown.`}
           >
@@ -97,13 +97,13 @@ export const MasterLedgerTable: React.FC<MasterLedgerTableProps> = ({
           </div>
 
           {isCurrentMonthOnly ? (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-bold">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-300 text-xs font-bold">
               <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse motion-reduce:animate-none" />
               <span>{t('currentMonth')}: <strong>{currentMonth}</strong></span>
             </div>
           ) : (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
-              <Calendar className="w-3.5 h-3.5 text-emerald-600" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
+              <Calendar className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>Active: {activeMonths.join(', ')}</span>
             </div>
           )}
@@ -116,13 +116,13 @@ export const MasterLedgerTable: React.FC<MasterLedgerTableProps> = ({
                 onOpenMonthSettings();
               }, 'configure ledger months and display settings');
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 hover:border-slate-400 text-xs font-bold shadow-2xs transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:border-slate-400 text-xs font-bold shadow-2xs transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer print:hidden"
             title="Configure billing months: Add, remove, hide, or focus on current month"
           >
-            <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-600" />
+            <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>{t('monthSettings')}</span>
             {isMonthScrollActive && (
-              <span className="px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 text-[10px]">
+              <span className="px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 text-[10px]">
                 Scroll
               </span>
             )}
@@ -130,23 +130,34 @@ export const MasterLedgerTable: React.FC<MasterLedgerTableProps> = ({
         </div>
       </div>
 
+      {/* Mobile Horizontal Swipe Affordance Bar */}
+      <div className="md:hidden px-3.5 py-2 bg-emerald-50/90 dark:bg-emerald-950/60 border-b border-emerald-200/60 dark:border-emerald-800/60 flex items-center justify-between text-[11px] text-emerald-950 dark:text-emerald-200 print:hidden">
+        <span className="flex items-center gap-1.5 font-medium">
+          <ChevronRight className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400 shrink-0" />
+          <span>সব মাসের হিসাব দেখতে ডানে সোয়াইপ করুন</span>
+        </span>
+        <span className="text-[10px] font-bold text-emerald-800 dark:text-emerald-300 bg-white dark:bg-slate-900 px-2 py-0.5 rounded border border-emerald-300 dark:border-emerald-700">
+          স্ক্রোল
+        </span>
+      </div>
+
       {/* Main Table Container */}
-      <div className="overflow-x-auto overscroll-x-contain [scrollbar-width:thin]">
+      <div className="overflow-x-auto print:overflow-visible overscroll-x-contain [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]">
         <table className="w-full text-left text-xs border-collapse">
           {/* Multi-tier Table Head */}
-          <thead className="bg-slate-100 text-slate-700 border-b border-slate-300 font-semibold select-none">
+          <thead className="bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border-b border-slate-300 dark:border-slate-700 font-semibold select-none">
             {/* Top row */}
             <tr>
-              <th rowSpan={2} className="px-2 py-2.5 border-r border-slate-300 w-10 text-center bg-slate-100 sticky left-0 z-10">
+              <th rowSpan={2} className="px-2 py-2.5 border-r border-slate-300 dark:border-slate-700 w-10 text-center bg-slate-100 dark:bg-slate-800 sticky left-0 z-10">
                 {t('colSl')}
               </th>
-              <th rowSpan={2} className="px-2.5 py-2.5 border-r border-slate-300 min-w-[130px] lg:min-w-[160px] sticky left-10 z-10 bg-slate-100">
+              <th rowSpan={2} className="px-2.5 py-2.5 border-r-2 border-slate-300 dark:border-slate-700 min-w-[120px] sm:min-w-[130px] lg:min-w-[160px] sticky left-10 z-10 bg-slate-100 dark:bg-slate-800">
                 {t('colMemberName')}
               </th>
-              <th rowSpan={2} className="px-2 py-2.5 border-r border-slate-300 text-center min-w-[70px]">
+              <th rowSpan={2} className="px-2 py-2.5 border-r border-slate-300 dark:border-slate-700 text-center min-w-[70px] bg-slate-100 dark:bg-slate-800">
                 {t('colShareId')}
               </th>
-              <th rowSpan={2} className="px-2 py-2.5 border-r-2 border-slate-300 text-right min-w-[75px] bg-slate-50">
+              <th rowSpan={2} className="px-2 py-2.5 border-r-2 border-slate-300 dark:border-slate-700 text-right min-w-[75px] bg-slate-50 dark:bg-slate-800/70">
                 {t('colAdmissionFee')}
               </th>
 
@@ -160,7 +171,7 @@ export const MasterLedgerTable: React.FC<MasterLedgerTableProps> = ({
                     className={`px-1.5 py-1.5 text-center font-bold transition-colors ${
                       isCurrent
                         ? 'bg-emerald-600 text-white border-r-2 border-emerald-700'
-                        : 'bg-slate-200/80 text-slate-800 border-r-2 border-slate-300'
+                        : 'bg-slate-200/80 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-r-2 border-slate-300 dark:border-slate-700'
                     }`}
                   >
                     <div className="flex items-center justify-center gap-1">
@@ -175,45 +186,45 @@ export const MasterLedgerTable: React.FC<MasterLedgerTableProps> = ({
                 );
               })}
 
-              <th rowSpan={2} className="px-2 py-2.5 border-r border-slate-300 text-right min-w-[80px] bg-emerald-50/70 text-emerald-900 font-bold">
+              <th rowSpan={2} className="px-2 py-2.5 border-r border-slate-300 dark:border-slate-700 text-right min-w-[80px] bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 font-bold">
                 {t('colTotalDeposit')}
               </th>
-              <th rowSpan={2} className="px-1.5 py-2.5 border-r border-slate-300 text-center min-w-[50px] bg-amber-50/40">
+              <th rowSpan={2} className="px-1.5 py-2.5 border-r border-slate-300 dark:border-slate-700 text-center min-w-[50px] bg-amber-50/40 dark:bg-amber-950/30 text-slate-700 dark:text-slate-300">
                 {t('colDueMths')}
               </th>
-              <th rowSpan={2} className="px-2 py-2.5 border-r border-slate-300 text-right min-w-[75px] bg-amber-50/70 text-amber-900">
+              <th rowSpan={2} className="px-2 py-2.5 border-r border-slate-300 dark:border-slate-700 text-right min-w-[75px] bg-amber-50/70 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 font-semibold">
                 {t('colDueAmount')}
               </th>
-              <th rowSpan={2} className="px-1.5 py-2.5 border-r border-slate-300 text-right min-w-[65px] bg-rose-50/50 text-rose-900">
+              <th rowSpan={2} className="px-1.5 py-2.5 border-r border-slate-300 dark:border-slate-700 text-right min-w-[65px] bg-rose-50/50 dark:bg-rose-950/30 text-rose-900 dark:text-rose-300 font-semibold">
                 {t('colLateFeeFine')}
               </th>
-              <th rowSpan={2} className="px-2 py-2.5 border-r border-slate-300 text-right min-w-[75px] bg-rose-100/70 text-rose-950 font-bold">
+              <th rowSpan={2} className="px-2 py-2.5 border-r border-slate-300 dark:border-slate-700 text-right min-w-[75px] bg-rose-100/70 dark:bg-rose-950/50 text-rose-950 dark:text-rose-200 font-bold">
                 {t('colTotalDue')}
               </th>
-              <th rowSpan={2} className="px-1.5 py-2.5 border-r border-slate-300 text-center min-w-[60px]">
+              <th rowSpan={2} className="px-1.5 py-2.5 border-r border-slate-300 dark:border-slate-700 text-center min-w-[60px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                 {t('colLateFeePaid')}
               </th>
-              <th rowSpan={2} className="px-2 py-2.5 text-center min-w-[80px]">
+              <th rowSpan={2} className="px-2 py-2.5 text-center min-w-[80px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 print:hidden">
                 {t('colActions')}
               </th>
             </tr>
 
             {/* Sub-row for Date & Amount */}
-            <tr className="border-t border-slate-200 text-xs text-slate-600 bg-slate-50">
+            <tr className="border-t border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80">
               {activeMonths.map((m) => {
                 const isCurrent = m === currentMonth;
                 return (
                   <React.Fragment key={`${m}-sub`}>
                     <th
-                      className={`px-2 py-1.5 border-r border-slate-200/60 text-center font-medium w-16 ${
-                        isCurrent ? 'bg-emerald-50/80 text-emerald-950 font-semibold' : ''
+                      className={`px-2 py-1.5 border-r border-slate-200/60 dark:border-slate-700 text-center font-medium w-16 ${
+                        isCurrent ? 'bg-emerald-50/80 dark:bg-emerald-950/50 text-emerald-950 dark:text-emerald-200 font-semibold' : 'bg-slate-50 dark:bg-slate-800/60'
                       }`}
                     >
                       {t('colDate')}
                     </th>
                     <th
                       className={`px-2 py-1.5 border-r-2 ${
-                        isCurrent ? 'border-emerald-500/50 bg-emerald-50/80 text-emerald-950 font-semibold' : 'border-slate-300'
+                        isCurrent ? 'border-emerald-500/50 bg-emerald-50/80 dark:bg-emerald-950/50 text-emerald-950 dark:text-emerald-200 font-semibold' : 'border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60'
                       } text-right font-medium w-16`}
                     >
                       {t('colAmount')}
@@ -256,7 +267,7 @@ export const MasterLedgerTable: React.FC<MasterLedgerTableProps> = ({
 
                   {/* Member Name */}
                   <td
-                    className={`px-3 py-2 border-r border-slate-200 font-sans font-bold text-sm sticky left-10 z-10 ${
+                    className={`px-3 py-2 border-r-2 border-slate-300 font-sans font-bold text-sm sticky left-10 z-10 ${
                       isClosed
                         ? 'bg-slate-100 text-slate-400'
                         : hasDue
@@ -485,7 +496,7 @@ export const MasterLedgerTable: React.FC<MasterLedgerTableProps> = ({
                   </td>
 
                   {/* Actions */}
-                  <td className="px-2 py-2 text-center font-sans">
+                  <td className="px-2 py-2 text-center font-sans print:hidden">
                     <div className="flex items-center justify-center gap-1.5">
                       <button
                         onClick={() => onOpenPaymentForShare(share)}
@@ -580,12 +591,34 @@ export const MasterLedgerTable: React.FC<MasterLedgerTableProps> = ({
                 {summary.totalLateFeeCollected > 0 ? summary.totalLateFeeCollected.toLocaleString('en-IN') : '-'}
               </td>
 
-              <td className="px-3 py-3 text-center text-slate-400 font-sans text-xs">
+              <td className="px-3 py-3 text-center text-slate-400 font-sans text-xs print:hidden">
                 Active {summary.totalActiveShares}
               </td>
             </tr>
           </tfoot>
         </table>
+      </div>
+
+      {/* Official Signatures & Seal (Visible on print / PDF only) */}
+      <div className="hidden print:grid grid-cols-3 gap-8 pt-8 pb-3 mt-6 text-center text-xs text-slate-800 border-t border-slate-300 page-break-inside-avoid">
+        <div>
+          <div className="border-t border-slate-400 w-3/4 mx-auto pt-1 font-bold text-slate-900">
+            Prepared By
+          </div>
+          <div className="text-[10px] text-slate-600">Accountant / হিসাবরক্ষক</div>
+        </div>
+        <div>
+          <div className="border-t border-slate-400 w-3/4 mx-auto pt-1 font-bold text-slate-900">
+            Verified By
+          </div>
+          <div className="text-[10px] text-slate-600">General Secretary / সাধারণ সম্পাদক</div>
+        </div>
+        <div>
+          <div className="border-t border-slate-400 w-3/4 mx-auto pt-1 font-bold text-slate-900">
+            Approved By
+          </div>
+          <div className="text-[10px] text-slate-600">President & Trustee / সভাপতি</div>
+        </div>
       </div>
 
       {/* Delete Share Confirmation Dialog */}

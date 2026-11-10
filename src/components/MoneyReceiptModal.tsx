@@ -117,7 +117,7 @@ export const MoneyReceiptModal: React.FC<MoneyReceiptModalProps> = ({
               <TextureButton
                 variant="emerald"
                 size="sm"
-                onClick={() => requireAdmin(handlePrint, 'print this money receipt')}
+                onClick={handlePrint}
                 className="w-auto"
               >
                 <Printer className="w-3.5 h-3.5" />
