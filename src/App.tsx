@@ -474,7 +474,11 @@ export default function App() {
 
   const handlePushToSheet = async () => {
     if (!connectedSheet) throw new Error('No Google Sheet linked.');
-    const token = await getAccessToken();
+    let token = await getAccessToken();
+    if (!token) {
+      const res = await googleSignIn();
+      token = res?.accessToken || null;
+    }
     if (!token) throw new Error('Please sign in with Google first.');
 
     setIsSyncing(true);
@@ -487,6 +491,17 @@ export default function App() {
       }
       setLastSyncedAt(new Date());
       showToast(`Successfully pushed ${shares.length} shares to "${connectedSheet.title}"!`);
+    } catch (err: any) {
+      if (err?.message?.includes('401') || err?.message?.includes('UNAUTHENTICATED')) {
+        const reAuth = await googleSignIn();
+        if (reAuth?.accessToken) {
+          await pushToGoogleSheet(connectedSheet.id, connectedSheet.sheetName, shares, summary, reAuth.accessToken);
+          setLastSyncedAt(new Date());
+          showToast(`Successfully pushed ${shares.length} shares to "${connectedSheet.title}"!`);
+          return;
+        }
+      }
+      throw err;
     } finally {
       setIsSyncing(false);
     }
@@ -494,7 +509,11 @@ export default function App() {
 
   const handlePullFromSheet = async () => {
     if (!connectedSheet) throw new Error('No Google Sheet linked.');
-    const token = await getAccessToken();
+    let token = await getAccessToken();
+    if (!token) {
+      const res = await googleSignIn();
+      token = res?.accessToken || null;
+    }
     if (!token) throw new Error('Please sign in with Google first.');
 
     setIsSyncing(true);
@@ -507,6 +526,22 @@ export default function App() {
       setShares(importedShares);
       setLastSyncedAt(new Date());
       showToast(`Updated ${importedShares.length} shares from Google Sheet!`);
+    } catch (err: any) {
+      if (err?.message?.includes('401') || err?.message?.includes('UNAUTHENTICATED')) {
+        const reAuth = await googleSignIn();
+        if (reAuth?.accessToken) {
+          const importedShares = await pullFromGoogleSheet(
+            connectedSheet.id,
+            connectedSheet.sheetName,
+            reAuth.accessToken
+          );
+          setShares(importedShares);
+          setLastSyncedAt(new Date());
+          showToast(`Updated ${importedShares.length} shares from Google Sheet!`);
+          return;
+        }
+      }
+      throw err;
     } finally {
       setIsSyncing(false);
     }
