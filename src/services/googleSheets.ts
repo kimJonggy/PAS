@@ -50,7 +50,7 @@ export function formatSharesForSheet(
   // Row 4 (Index 3): KPI Cards Values & Sub-stats
   const row4 = new Array(20).fill('');
   row4[0] = `${summary.totalActiveShares} Shares`;
-  row4[1] = '30 Active Members (32 IDs)';
+  row4[1] = '21 Active Members (32 Allotted IDs)';
   row4[2] = `Tk. ${summary.totalBankDeposit.toLocaleString('en-IN')}`;
   row4[3] = `Admission: Tk. ${summary.totalAdmissionCollected.toLocaleString('en-IN')} | Monthly: Tk. ${summary.totalMonthlyCollected.toLocaleString('en-IN')} | Late Fee: Tk. ${summary.totalLateFeeCollected.toLocaleString('en-IN')}`;
   row4[7] = `Tk. ${summary.totalOutstandingDue.toLocaleString('en-IN')}`;
@@ -595,6 +595,70 @@ export async function applySheetStyling(
         },
       },
       fields: 'userEnteredFormat(backgroundColor,textFormat,verticalAlignment)',
+    },
+  });
+
+  // 6. Freeze Top 6 Rows (Title, KPI, Headers) and First 3 Columns (SL, Member Name, Share ID)
+  requests.push({
+    updateSheetProperties: {
+      properties: {
+        sheetId,
+        gridProperties: {
+          frozenRowCount: 6,
+          frozenColumnCount: 3,
+        },
+      },
+      fields: 'gridProperties.frozenRowCount,gridProperties.frozenColumnCount',
+    },
+  });
+
+  // 7. Clean Table Grid Borders (from header row 4 to grand total row)
+  requests.push({
+    updateBorders: {
+      range: {
+        sheetId,
+        startRowIndex: 4,
+        endRowIndex: grandTotalRow + 1,
+        startColumnIndex: 0,
+        endColumnIndex: 20,
+      },
+      top: { style: 'SOLID_MEDIUM', color: { red: 0.1, green: 0.28, blue: 0.16 } },
+      bottom: { style: 'SOLID_MEDIUM', color: { red: 0.1, green: 0.28, blue: 0.16 } },
+      left: { style: 'SOLID', color: { red: 0.75, green: 0.8, blue: 0.85 } },
+      right: { style: 'SOLID', color: { red: 0.75, green: 0.8, blue: 0.85 } },
+      innerHorizontal: { style: 'SOLID', color: { red: 0.88, green: 0.9, blue: 0.92 } },
+      innerVertical: { style: 'SOLID', color: { red: 0.88, green: 0.9, blue: 0.92 } },
+    },
+  });
+
+  // 8. Conditional Formatting: Red highlight on 'Due' status cells
+  requests.push({
+    addConditionalFormatRule: {
+      rule: {
+        ranges: [
+          {
+            sheetId,
+            startRowIndex: 6,
+            endRowIndex: 6 + shares.length,
+            startColumnIndex: 4,
+            endColumnIndex: 14,
+          },
+        ],
+        booleanRule: {
+          condition: {
+            type: 'TEXT_EQ',
+            values: [{ userEnteredValue: 'Due' }],
+          },
+          format: {
+            backgroundColor: { red: 1.0, green: 0.9, blue: 0.9 },
+            textFormat: {
+              foregroundColor: { red: 0.8, green: 0.1, blue: 0.1 },
+              bold: true,
+            },
+          },
+        },
+      },
+      index: 0,
     },
   });
 
